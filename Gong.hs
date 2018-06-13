@@ -7,6 +7,7 @@ import SymbolicSem
 import Liveness
 import Safety
 import TypeSize (maxnestednames, sizeOfEqs)
+import Data.Char
 
 import Data.List as L
 import Unbound.LocallyNameless (runFreshM,unbind)
@@ -53,15 +54,22 @@ main :: IO ()
 main = do
   pargs <- cmdArgs (modes [subargs])
   tyfile <- (readFile $ gofile pargs)
+  putStrLn $ "tyfileeee: " ++ tyfile
   case fullPass tyfile of
     Left err -> print err
     Right ty -> do if runCheck ((check pargs) ==  Debug) ty
                      then do
+                     putStrLn $ "kbound " ++ show ty
                      let bound =  if (kbound pargs) == -1 || (kbound pargs) == 888
                                   then maximum [maxnestednames ty, sizeOfEqs ty]
                                   else kbound pargs
+                     putStrLn $ "bound: " ++ show bound;
                      let listsys = succs bound ty
                      let !tylist = runFreshM listsys
+                     putStrLn $ "TyList entera: " ++ show tylist
+                     putStrLn $ "--------------------------------"
+                     putStrLn $ "Len de la tylist: " ++ show (length tylist)
+                     putStrLn $ "Tylist " ++ show (head (tail tylist))
                      putStrLn $ "Bound (k): "++(show bound)
                      putStrLn $ "Number of k-states: "++(show $ length tylist)
                      when ((check pargs) ==  Debug || (check pargs)==List) $ do
