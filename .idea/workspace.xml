@@ -2,7 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0ffb473f-feba-47ff-a3b3-46678e629185" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/Gong.hs" afterPath="$PROJECT_DIR$/Gong.hs" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change beforePath="$PROJECT_DIR$/GoParser.hs" afterPath="$PROJECT_DIR$/GoParser.hs" />
+      <change beforePath="$PROJECT_DIR$/StuffParams.hs" afterPath="$PROJECT_DIR$/StuffParams.hs" />
+      <change beforePath="$PROJECT_DIR$/SymbolicSem.hs" afterPath="$PROJECT_DIR$/SymbolicSem.hs" />
+      <change beforePath="$PROJECT_DIR$/selects_test.migo" afterPath="$PROJECT_DIR$/selects_test.migo" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -13,11 +17,21 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="Gong.hs" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Gong.hs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Gong.hs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="150">
-              <caret line="62" column="30" lean-forward="false" selection-start-line="62" selection-start-column="25" selection-end-line="62" selection-end-column="30" />
+            <state relative-caret-position="855">
+              <caret line="57" column="22" lean-forward="false" selection-start-line="57" selection-start-column="7" selection-end-line="57" selection-end-column="22" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Liveness.hs" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Liveness.hs">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1575">
+              <caret line="105" column="29" lean-forward="false" selection-start-line="105" selection-start-column="18" selection-end-line="105" selection-end-column="29" />
               <folding />
             </state>
           </provider>
@@ -26,8 +40,8 @@
       <file leaf-file-name="TypeSize.hs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/TypeSize.hs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1238">
-              <caret line="101" column="57" lean-forward="false" selection-start-line="101" selection-start-column="57" selection-end-line="101" selection-end-column="57" />
+            <state relative-caret-position="300">
+              <caret line="20" column="30" lean-forward="false" selection-start-line="20" selection-start-column="30" selection-end-line="20" selection-end-column="30" />
               <folding />
             </state>
           </provider>
@@ -36,8 +50,8 @@
       <file leaf-file-name="StuffParams.hs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/StuffParams.hs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="6840">
-              <caret line="456" column="21" lean-forward="false" selection-start-line="456" selection-start-column="21" selection-end-line="456" selection-end-column="21" />
+            <state relative-caret-position="6270">
+              <caret line="418" column="35" lean-forward="false" selection-start-line="418" selection-start-column="35" selection-end-line="418" selection-end-column="35" />
               <folding />
             </state>
           </provider>
@@ -56,18 +70,18 @@
       <file leaf-file-name="PrettyGoTypes.hs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/PrettyGoTypes.hs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="713">
-              <caret line="113" column="26" lean-forward="false" selection-start-line="113" selection-start-column="26" selection-end-line="113" selection-end-column="26" />
+            <state relative-caret-position="645">
+              <caret line="43" column="12" lean-forward="false" selection-start-line="43" selection-start-column="12" selection-end-line="43" selection-end-column="12" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SymbolicSem.hs" pinned="false" current-in-tab="false">
+      <file leaf-file-name="SymbolicSem.hs" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/SymbolicSem.hs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="202">
-              <caret line="182" column="81" lean-forward="false" selection-start-line="182" selection-start-column="81" selection-end-line="182" selection-end-column="81" />
+            <state relative-caret-position="313">
+              <caret line="200" column="72" lean-forward="false" selection-start-line="200" selection-start-column="72" selection-end-line="200" selection-end-column="72" />
               <folding />
             </state>
           </provider>
@@ -76,8 +90,8 @@
       <file leaf-file-name="GoTypes.hs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/GoTypes.hs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="210">
-              <caret line="38" column="32" lean-forward="false" selection-start-line="38" selection-start-column="32" selection-end-line="38" selection-end-column="32" />
+            <state relative-caret-position="1140">
+              <caret line="76" column="10" lean-forward="false" selection-start-line="76" selection-start-column="9" selection-end-line="76" selection-end-column="10" />
               <folding />
             </state>
           </provider>
@@ -86,18 +100,8 @@
       <file leaf-file-name="GoParser.hs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/GoParser.hs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="238">
-              <caret line="256" column="45" lean-forward="false" selection-start-line="256" selection-start-column="45" selection-end-line="256" selection-end-column="45" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Liveness.hs" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Liveness.hs">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1605">
-              <caret line="107" column="49" lean-forward="false" selection-start-line="107" selection-start-column="49" selection-end-line="107" selection-end-column="49" />
+            <state relative-caret-position="2055">
+              <caret line="137" column="35" lean-forward="false" selection-start-line="137" selection-start-column="31" selection-end-line="137" selection-end-column="35" />
               <folding />
             </state>
           </provider>
@@ -107,22 +111,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>Eqn</find>
-      <find>cmdArgs</find>
-      <find>runCheck</find>
-      <find>runFreshM</find>
-      <find>M</find>
-      <find>genSuccs</find>
-      <find>liveness</find>
-      <find>findMatch</find>
-      <find>checkStates</find>
-      <find>succs</find>
-      <find>check ::</find>
-      <find>check</find>
-      <find>EqnSys</find>
-      <find>symsemB</find>
-      <find>maxnestednames</find>
-      <find>type</find>
       <find>unsafeUnbin</find>
       <find>data Eqn</find>
       <find>L.null</find>
@@ -130,12 +118,29 @@
       <find>normalise</find>
       <find>pparser</find>
       <find>fullparse</find>
-      <find>fullPass</find>
-      <find>parseprog</find>
       <find>mainparser</find>
       <find>transformProg</find>
       <find>transformMa</find>
       <find>succs ::</find>
+      <find>fv</find>
+      <find>checkStates</find>
+      <find>Send</find>
+      <find>runCheck ::</find>
+      <find>fullPass</find>
+      <find>parseprog</find>
+      <find>dparser</find>
+      <find>identifier</find>
+      <find>emptyDef</find>
+      <find>seqInterm</find>
+      <find>parens</find>
+      <find>Select</find>
+      <find>symbol</find>
+      <find>itparser</find>
+      <find>Spawn</find>
+      <find>Spawn</find>
+      <find>liveness ::</find>
+      <find>extractType ::</find>
+      <find>unbind</find>
     </findStrings>
   </component>
   <component name="GOROOT" path="/usr/local/go" />
@@ -146,10 +151,13 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/Liveness.hs" />
-        <option value="$PROJECT_DIR$/SymbolicSem.hs" />
-        <option value="$PROJECT_DIR$/GoParser.hs" />
         <option value="$PROJECT_DIR$/Gong.hs" />
         <option value="$PROJECT_DIR$/GoTypes.hs" />
+        <option value="$PROJECT_DIR$/TypeSize.hs" />
+        <option value="$PROJECT_DIR$/PrettyGoTypes.hs" />
+        <option value="$PROJECT_DIR$/StuffParams.hs" />
+        <option value="$PROJECT_DIR$/GoParser.hs" />
+        <option value="$PROJECT_DIR$/SymbolicSem.hs" />
       </list>
     </option>
   </component>
@@ -162,8 +170,8 @@
   <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="138" />
     <option name="y" value="48" />
-    <option name="width" value="1376" />
-    <option name="height" value="821" />
+    <option name="width" value="1368" />
+    <option name="height" value="817" />
   </component>
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="" version="1">
@@ -181,6 +189,7 @@
     </navigator>
     <panes>
       <pane id="Scratches" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -192,11 +201,10 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../plastic-jay/ayabot" />
     <property name="go.sdk.automatically.set" value="true" />
     <property name="SearchEverywhereHistoryKey" value="&#9;FILE&#9;file:///home/damifur/go/src/github.com/nickng/gong/Gong.hs" />
   </component>
@@ -219,11 +227,10 @@
     <frame x="-1" y="0" width="1602" height="873" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.130625" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.110625" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32901555" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -235,6 +242,7 @@
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32901555" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
@@ -585,22 +593,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Liveness.hs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1605">
-          <caret line="107" column="49" lean-forward="false" selection-start-line="107" selection-start-column="49" selection-end-line="107" selection-end-column="49" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/StuffParams.hs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="6840">
-          <caret line="456" column="21" lean-forward="false" selection-start-line="456" selection-start-column="21" selection-end-line="456" selection-end-column="21" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Safety.hs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="720">
@@ -609,50 +601,66 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/GoParser.hs">
+    <entry file="file://$PROJECT_DIR$/TypeSize.hs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
-          <caret line="256" column="45" lean-forward="false" selection-start-line="256" selection-start-column="45" selection-end-line="256" selection-end-column="45" />
+        <state relative-caret-position="300">
+          <caret line="20" column="30" lean-forward="false" selection-start-line="20" selection-start-column="30" selection-end-line="20" selection-end-column="30" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/PrettyGoTypes.hs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="713">
-          <caret line="113" column="26" lean-forward="false" selection-start-line="113" selection-start-column="26" selection-end-line="113" selection-end-column="26" />
+        <state relative-caret-position="645">
+          <caret line="43" column="12" lean-forward="false" selection-start-line="43" selection-start-column="12" selection-end-line="43" selection-end-column="12" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/TypeSize.hs">
+    <entry file="file://$PROJECT_DIR$/StuffParams.hs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1238">
-          <caret line="101" column="57" lean-forward="false" selection-start-line="101" selection-start-column="57" selection-end-line="101" selection-end-column="57" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/GoTypes.hs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="38" column="32" lean-forward="false" selection-start-line="38" selection-start-column="32" selection-end-line="38" selection-end-column="32" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/SymbolicSem.hs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="202">
-          <caret line="182" column="81" lean-forward="false" selection-start-line="182" selection-start-column="81" selection-end-line="182" selection-end-column="81" />
+        <state relative-caret-position="6270">
+          <caret line="418" column="35" lean-forward="false" selection-start-line="418" selection-start-column="35" selection-end-line="418" selection-end-column="35" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Gong.hs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="62" column="30" lean-forward="false" selection-start-line="62" selection-start-column="25" selection-end-line="62" selection-end-column="30" />
+        <state relative-caret-position="855">
+          <caret line="57" column="22" lean-forward="false" selection-start-line="57" selection-start-column="7" selection-end-line="57" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Liveness.hs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1575">
+          <caret line="105" column="29" lean-forward="false" selection-start-line="105" selection-start-column="18" selection-end-line="105" selection-end-column="29" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/GoParser.hs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2055">
+          <caret line="137" column="35" lean-forward="false" selection-start-line="137" selection-start-column="31" selection-end-line="137" selection-end-column="35" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/GoTypes.hs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1140">
+          <caret line="76" column="10" lean-forward="false" selection-start-line="76" selection-start-column="9" selection-end-line="76" selection-end-column="10" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SymbolicSem.hs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="313">
+          <caret line="200" column="72" lean-forward="false" selection-start-line="200" selection-start-column="72" selection-end-line="200" selection-end-column="72" />
           <folding />
         </state>
       </provider>

@@ -8,6 +8,7 @@ import Control.Monad.Trans.Maybe
 import Data.Functor
 import Data.List as L
 import Data.Set as S
+import Data.Char as C
 import Data.Maybe
 import Control.Applicative ((<*),(*>))
 import Unbound.LocallyNameless
@@ -36,7 +37,7 @@ instance Functor Prog where
 data Interm = Seq [Interm]
               | Call String [String]
               | Cl String
-              | Spawn String [String]
+              | Spawn Int String [String]
               | NewChan String String Integer
               | If Interm Interm
               | Select [Interm]
@@ -131,7 +132,10 @@ itparser =
   do { reserved "spawn"
      ; x <- identifier
      ; list <- parens (P.sepBy identifier (P.char ',' <* P.spaces))
-     ; return $ Spawn x list }
+     ; symbol "%"
+     ; line <- many $ P.digit
+     ; let l = read line :: Int in
+            return $ Spawn l x list }
   <|>
   do { reserved "select"
      ; l <- many (reserved "case" *> seqInterm)
@@ -234,7 +238,7 @@ transformSeq vars (x:xs) =
     (Cl s) -> throwError [s] vars $
               GT.Close (s2n s) (transformSeq vars xs)
     
-    (Spawn s l) -> throwError l vars $
+    (Spawn line s l) -> throwError l vars $
                    GT.Par [(GT.ChanInst (GT.TVar (s2n s)) (L.map s2n l)) , (transformSeq vars xs)]
 
     (NewChan s1 s2 n) -> GT.New (fromIntegral n) (bind (s2n s1) (transformSeq (s1:vars) xs))

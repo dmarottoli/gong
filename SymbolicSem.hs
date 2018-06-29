@@ -128,7 +128,7 @@ compatibleConts xs ys =
 
 
 match :: GoType -> GoType -> Bool
-match ((Send c1 _)) ((Recv c2 _)) =  c1 == c2 
+match ((Send c1 _)) ((Recv c2 _)) =  c1 == c2
 match ((Recv c2 _)) ((Send c1 _)) =  c1 == c2
 match ((Close c _)) ((ClosedBuffer c')) = c == c'
 match _ _ = False
@@ -193,7 +193,7 @@ succs :: Int -> Eqn -> M [Eqn]
 succs bound sys = succsNode bound [] sys
 
 succsNode :: Int -> [ChName] -> Eqn -> M [Eqn]
-succsNode bound names sys@(EqnSys bnd) =
+succsNode bound names (EqnSys bnd) =
   let k = if L.null names then bound else length names
   in do (defs,main) <- unbind bnd
         states <- genStates k names (unrec defs) []
