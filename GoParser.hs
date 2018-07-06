@@ -35,15 +35,15 @@ instance Functor Prog where
     fmap f (P l) = P (fmap (fmap f) l)
                      
 data Interm = Seq [Interm]
-              | Call String [String]
-              | Cl String
+              | Call Int String [String]
+              | Cl Int String
               | Spawn Int String [String]
-              | NewChan String String Integer
-              | If Interm Interm
-              | Select [Interm]
-              | T
-              | S String
-              | R String
+              | NewChan Int String String Integer
+              | If Int Interm Interm
+              | Select Int [Interm]
+              | T Int
+              | S Int String
+              | R Int String
               | Zero
          deriving (Eq, Show)
 
@@ -127,7 +127,10 @@ itparser :: P.Parser Interm
 itparser = 
   do { reserved  "close"
      ; c <- identifier
-     ; return $ (Cl c) }
+     ; symbol "%"
+     ; line <- many $ P.digit
+     ; let l = read line :: Int in
+            return $ (Cl l c) }
   <|>
   do { reserved "spawn"
      ; x <- identifier
@@ -140,7 +143,10 @@ itparser =
   do { reserved "select"
      ; l <- many (reserved "case" *> seqInterm)
      ; reserved "endselect"
-     ; return $ Select l }
+     ; symbol "%"
+     ; line <- many $ P.digit
+     ; let li = read line :: Int in
+             return $ Select li l }
   <|>
   do { reserved "let"
      ; x <- identifier
@@ -149,30 +155,48 @@ itparser =
      ; t <- identifier
      ; symbol ","
      ; n <- natural
-     ; return $ NewChan x t n }
+     ; symbol "%"
+     ; line <- many $ P.digit
+     ; let l = read line :: Int in
+            return $ NewChan l x t n }
   <|>
   do { reserved "if"
      ; t <- seqInterm
      ; reserved "else"
      ; e <- seqInterm
      ; reserved "endif"
-     ; return $ If t e }
+     ; symbol "%"
+     ; line <- many $ P.digit
+     ; let l = read line :: Int in
+            return $ If l t e }
   <|>
   do { reserved "tau"
-     ; return $ T   }
+     ; symbol "%"
+     ; line <- many $ P.digit
+     ; let l = read line :: Int in
+            return $ T l  }
   <|>
   do { reserved "send"
      ; c <- identifier
-     ; return $ S c  }
+     ; symbol "%"
+     ; line <- many $ P.digit
+     ; let l = read line :: Int in
+            return $ S l c  }
   <|>
   do { reserved "recv"
      ; c <- identifier
-     ; return $  R c  }
+     ; symbol "%"
+     ; line <- many $ P.digit
+     ; let l = read line :: Int in
+            return $  R l c  }
   <|>
   do  { reserved "call"
   ; c <- identifier
   ; list <- parens (P.sepBy identifier (P.char ',' <* P.spaces))
-  ;  return $ Call c list }
+  ; symbol "%"
+  ; line <- many $ P.digit
+  ; let l = read line :: Int in
+           return $ Call l c list }
  <|>
   do { return $ Zero }
 
@@ -196,14 +220,14 @@ parseTest s =
 
 contzElim :: Interm -> Interm
 contzElim (Seq l) = Seq (contzElim' l)
-contzElim (If p1 p2) = If (contzElim p1) (contzElim p2)
-contzElim (Select l) = Select (L.map contzElim l)
+contzElim (If l p1 p2) = If l (contzElim p1) (contzElim p2)
+contzElim (Select li l) = Select li (L.map contzElim l)
 contzElim p = p
 
 contzElim' (x:y:xs) = case (x,y) of
-                        (Call _ _ , Zero) -> [x] -- No need to keep going
-                        (If p1 p2, Zero) -> [If (contzElim p1) (contzElim p2)]
-                        (Select l , Zero) -> [Select (L.map contzElim l)]
+                        (Call _ _ _ , Zero) -> [x] -- No need to keep going
+                        (If l p1 p2, Zero) -> [If l (contzElim p1) (contzElim p2)]
+                        (Select li l , Zero) -> [Select li (L.map contzElim l)]
                         (_,_) -> (contzElim x):(contzElim' (y:xs))
 contzElim' ([x]) = [contzElim x]
 contzElim' [] = []
@@ -232,27 +256,27 @@ throwError current known ty =
 transformSeq :: [String] -> [Interm] -> GT.GoType
 transformSeq vars (x:xs) =
   case x of
-    (Call s l) -> throwError l vars $
+    (Call _ s l) -> throwError l vars $
                   GT.Seq [(GT.ChanInst (GT.TVar (s2n s)) (L.map s2n l)), (transformSeq vars xs) ]
     
-    (Cl s) -> throwError [s] vars $
+    (Cl _ s) -> throwError [s] vars $
               GT.Close (s2n s) (transformSeq vars xs)
     
-    (Spawn line s l) -> throwError l vars $
+    (Spawn _ s l) -> throwError l vars $
                    GT.Par [(GT.ChanInst (GT.TVar (s2n s)) (L.map s2n l)) , (transformSeq vars xs)]
 
-    (NewChan s1 s2 n) -> GT.New (fromIntegral n) (bind (s2n s1) (transformSeq (s1:vars) xs))
+    (NewChan _ s1 s2 n) -> GT.New (fromIntegral n) (bind (s2n s1) (transformSeq (s1:vars) xs))
     
-    (If p1 p2) -> GT.IChoice (transform vars p1) (transform vars p2)
+    (If _ p1 p2) -> GT.IChoice (transform vars p1) (transform vars p2)
     
-    (Select l) -> GT.OChoice (L.map (transform vars) l)
+    (Select _ l) -> GT.OChoice (L.map (transform vars) l)
     
-    (T) -> GT.Tau (transformSeq vars xs)
+    (T _) -> GT.Tau (transformSeq vars xs)
     
-    (S s) -> throwError [s] vars $
+    (S _ s) -> throwError [s] vars $
              GT.Send (s2n s) (transformSeq vars xs)
            
-    (R s) -> throwError [s] vars $
+    (R _ s) -> throwError [s] vars $
              GT.Recv (s2n s) (transformSeq vars xs)
     (Zero) -> GT.Null  
 transformSeq vars [] = GT.Null
