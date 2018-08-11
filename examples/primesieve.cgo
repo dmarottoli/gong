@@ -2,22 +2,22 @@
 -- it is live and safe
 -- and should take less than a second to be checked.
 --
-def t0() : let a = newchan ty, 0 ; 
-	   spawn g(a);
-	   spawn r(a);
+def t0() : let a = newchan ty, 0%1; 
+	   spawn g(a)%2;
+	   spawn r(a)%3;
 
-def r(x): recv x; 
-    	  let b = newchan ty, 0;
-	  spawn f(x,b);
-	  spawn r(b);
+def r(x): recv x%4; 
+    	  let b = newchan ty, 0%5;
+	  spawn f(x,b)%6;
+	  spawn r(b)%7;
 
-def f(x,y): recv x;
+def f(x,y): recv x%8;
     	    if
-	      	    send y;
-		    call f(x,y);
+	      	    send y%9;
+		    call f(x,y)%10;
 	    else
-		    call f(x,y);
-	    endif;
+		    call f(x,y)%11;
+	    endif%12;
 	      
-def g(x): send x;
-     	  call g(x);
+def g(x): send x%13;
+     	  call g(x)%14;

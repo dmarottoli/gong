@@ -66,8 +66,7 @@ main = do
                      putStrLn $ "bound: " ++ show bound;
                      let listsys = succs bound ty
                      let !tylist = runFreshM listsys
-                     putStrLn $ "TyList entera: " ++ show tylist
-                     putStrLn $ "--------------------------------"
+                     putStrLn $ "TyList Completa: " ++ show tylist
                      putStrLn $ "Len de la tylist: " ++ show (length tylist)
                      putStrLn $ "Tylist " ++ show (head (tail tylist))
                      putStrLn $ "Bound (k): "++(show bound)

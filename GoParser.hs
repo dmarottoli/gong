@@ -40,7 +40,7 @@ data Interm = Seq [Interm]
               | Spawn Int String [String]
               | NewChan Int String String Integer
               | If Int Interm Interm
-              | Select Int [Interm]
+              | Select [Interm]
               | T Int
               | S Int String
               | R Int String
@@ -127,7 +127,7 @@ itparser :: P.Parser Interm
 itparser = 
   do { reserved  "close"
      ; c <- identifier
-     ; symbol "%"
+     ; symbol "@"
      ; line <- many $ P.digit
      ; let l = read line :: Int in
             return $ (Cl l c) }
@@ -135,7 +135,7 @@ itparser =
   do { reserved "spawn"
      ; x <- identifier
      ; list <- parens (P.sepBy identifier (P.char ',' <* P.spaces))
-     ; symbol "%"
+     ; symbol "@"
      ; line <- many $ P.digit
      ; let l = read line :: Int in
             return $ Spawn l x list }
@@ -143,10 +143,7 @@ itparser =
   do { reserved "select"
      ; l <- many (reserved "case" *> seqInterm)
      ; reserved "endselect"
-     ; symbol "%"
-     ; line <- many $ P.digit
-     ; let li = read line :: Int in
-             return $ Select li l }
+     ; return $ Select l }
   <|>
   do { reserved "let"
      ; x <- identifier
@@ -155,7 +152,7 @@ itparser =
      ; t <- identifier
      ; symbol ","
      ; n <- natural
-     ; symbol "%"
+     ; symbol "@"
      ; line <- many $ P.digit
      ; let l = read line :: Int in
             return $ NewChan l x t n }
@@ -165,27 +162,27 @@ itparser =
      ; reserved "else"
      ; e <- seqInterm
      ; reserved "endif"
-     ; symbol "%"
+     ; symbol "@"
      ; line <- many $ P.digit
      ; let l = read line :: Int in
             return $ If l t e }
   <|>
   do { reserved "tau"
-     ; symbol "%"
+     ; symbol "@"
      ; line <- many $ P.digit
      ; let l = read line :: Int in
             return $ T l  }
   <|>
   do { reserved "send"
      ; c <- identifier
-     ; symbol "%"
+     ; symbol "@"
      ; line <- many $ P.digit
      ; let l = read line :: Int in
             return $ S l c  }
   <|>
   do { reserved "recv"
      ; c <- identifier
-     ; symbol "%"
+     ; symbol "@"
      ; line <- many $ P.digit
      ; let l = read line :: Int in
             return $  R l c  }
@@ -193,7 +190,7 @@ itparser =
   do  { reserved "call"
   ; c <- identifier
   ; list <- parens (P.sepBy identifier (P.char ',' <* P.spaces))
-  ; symbol "%"
+  ; symbol "@"
   ; line <- many $ P.digit
   ; let l = read line :: Int in
            return $ Call l c list }
@@ -221,13 +218,13 @@ parseTest s =
 contzElim :: Interm -> Interm
 contzElim (Seq l) = Seq (contzElim' l)
 contzElim (If l p1 p2) = If l (contzElim p1) (contzElim p2)
-contzElim (Select li l) = Select li (L.map contzElim l)
+contzElim (Select l) = Select (L.map contzElim l)
 contzElim p = p
 
 contzElim' (x:y:xs) = case (x,y) of
                         (Call _ _ _ , Zero) -> [x] -- No need to keep going
                         (If l p1 p2, Zero) -> [If l (contzElim p1) (contzElim p2)]
-                        (Select li l , Zero) -> [Select li (L.map contzElim l)]
+                        (Select l , Zero) -> [Select (L.map contzElim l)]
                         (_,_) -> (contzElim x):(contzElim' (y:xs))
 contzElim' ([x]) = [contzElim x]
 contzElim' [] = []
@@ -269,7 +266,7 @@ transformSeq vars (x:xs) =
     
     (If _ p1 p2) -> GT.IChoice (transform vars p1) (transform vars p2)
     
-    (Select _ l) -> GT.OChoice (L.map (transform vars) l)
+    (Select l) -> GT.OChoice (L.map (transform vars) l)
     
     (T _) -> GT.Tau (transformSeq vars xs)
     

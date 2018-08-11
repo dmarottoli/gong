@@ -51,6 +51,7 @@ unfoldTillGuard k m seen defEnv (Par xs) =
 unfoldTillGuard k m  seen defEnv ori@(ChanInst (TVar t) lc)
   | (symCondition m lc) || (t `L.elem` seen) = return ori
   | otherwise =
+--  Acá es donde reemplaza la llamada a ChanInst TVar t por lo que hay en la lista de definiciones
     case L.lookup t defEnv of
       Just (Embed ty) ->
            case ty of
@@ -196,8 +197,14 @@ succsNode :: Int -> [ChName] -> Eqn -> M [Eqn]
 succsNode bound names (EqnSys bnd) =
   let k = if L.null names then bound else length names
   in do (defs,main) <- unbind bnd
+--        traceM ("\n bnd ------------------------------------------------------ " ++ (show bnd))
+--        traceM ("\n defs ------------------------------------------------------ " ++ (show defs))
+--        traceM ("\n main ------------------------------------------------------ " ++ (show main))
+--        traceM ("\n NORMALIZE ------------------------------------------------------" ++ (show (normalise k names (unrec defs) main)))
         states <- genStates k names (unrec defs) []
                   [(normalise k names (unrec defs) main)]
+--        traceM ("\n LLEGO ACAAAAAAAA???")
+--        traceM ("\n states ------------------------------------------------------ " ++ (show states))
         return $ L.map (\x -> EqnSys $ bind defs x) (states :: [GoType])
 
 
