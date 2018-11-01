@@ -5,6 +5,7 @@ import GoTypes
 import SymbolicSem
 import Utils
 import PrettyGoTypes
+import Data.List
 
 
 import Unbound.LocallyNameless
@@ -25,17 +26,17 @@ import Debug.Trace
 
 -- Barbs of a "sequential" type
 barbs :: GoType -> [GoType]
-barbs (Send n t) = [Send n Null]
-barbs (Recv n t) = [Recv n Null]
+barbs (Send l n t) = [Send l n Null]
+barbs (Recv l n t) = [Recv l n Null]
 barbs (OChoice xs) = L.foldr (++) [] $ L.map barbs xs
 barbs (New i bnd) = let (c,ty) = unsafeUnbind bnd
                     in barbs ty
 barbs (Par xs) = L.foldr (++) [] $ L.map barbs xs
 barbs (Buffer c (open,b,k))
-  | (k < b) && (k > 0) = [Send c Null, Recv c Null]
-  | k > 0 = [Send c Null]
-  | k < b = [Recv c Null]
-  | not open = [Send c Null]
+  | (k < b) && (k > 0) = [Send 0 c Null, Recv 0 c Null]
+  | k > 0 = [Send 0 c Null]
+  | k < b = [Recv 0 c Null]
+  | not open = [Send 0 c Null]
   | otherwise = [] 
 barbs t = []
 
@@ -109,12 +110,20 @@ liveness debug k eqs =
             if out
               then liveness debug k $ return xs
               else if debug
-                   then error $ "Term not live: " ++(show $ L.map pprintType ty)
+                   then error $ "Term not live: " ++(show $ show ty) ++ "\n" ++ "Problem: " ++ (show $ show main) ++ "\n" ++ (analyze ty)
                    else return False
        [] -> return True
 
+analyze :: [GoType] -> String
+analyze gt = intercalate "; " (map notSynch gt)
+--analyze [] = ""
+--analyze (x:xs) = notSynch x ++ analyze xs
 
-
+notSynch :: GoType -> String
+notSynch gt = case gt of
+                (Send l c _) -> "There is a Send operation without synch on line " ++ (show l)
+                (Recv l c _) -> "There is a Recv operation without synch on line " ++ (show l)
+                otherwise -> ""
 
 -- ATTEMPT AT PARALLELISATION OF LIVENESS
 --

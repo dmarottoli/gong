@@ -11,6 +11,10 @@ import Unbound.LocallyNameless.Ops
 import Data.List as L
 import Data.Set as S (intersection, null, fromList)
 
+import Control.Monad.State
+import Control.Monad.Trans.Class
+import Control.Monad.IO.Class
+
 -- DEBUG
 import System.IO.Unsafe
 import Debug.Trace
@@ -37,19 +41,20 @@ symCondition m b = S.null $ intersection (fromList m) (fromList b)
 normalise :: Int -> [ChName] -> Environment -> GoType -> GoType
 normalise k names defEnv ty =
   let t1 = nfUnfold k names [] defEnv ty
-  in runFreshM $ nf (gcBuffer . initiate $ t1)
+  in runFreshM $ nf (gcBuffer . initiate $ evalState t1 "") -- Estoy tirando el estado. Dps usarlo para algo
 
 
-nfUnfold :: Int -> [ChName] -> [EqnName] -> Environment -> GoType -> M GoType
+nfUnfold :: Int -> [ChName] -> [EqnName] -> Environment -> GoType -> State String (M GoType)
 nfUnfold k m seen defEnv t =
   unfoldTillGuard k m seen defEnv t
 
-unfoldTillGuard :: Int -> [ChName] -> [EqnName] -> Environment -> GoType -> M GoType
+-- PILA
+unfoldTillGuard :: Int -> [ChName] -> [EqnName] -> Environment -> GoType -> State String (M GoType)
 unfoldTillGuard k m seen defEnv (Par xs) =
-  do ys <- (sequence (map (unfoldTillGuard k m seen defEnv) xs))
-     return $ Par ys
+  do ys <- sequence (map (unfoldTillGuard k m seen defEnv) xs)
+     return $ return $ (Par (concat (sequence ys)))
 unfoldTillGuard k m  seen defEnv ori@(ChanInst (TVar t) lc)
-  | (symCondition m lc) || (t `L.elem` seen) = return ori
+  | (symCondition m lc) || (t `L.elem` seen) = return $ return ori
   | otherwise =
 --  Acá es donde reemplaza la llamada a ChanInst TVar t por lo que hay en la lista de definiciones
     case L.lookup t defEnv of
@@ -61,26 +66,26 @@ unfoldTillGuard k m  seen defEnv ori@(ChanInst (TVar t) lc)
                              (\(d,c) acc -> compose acc (single (AnyName d) (AnyName c)))
                              (Unbound.LocallyNameless.empty) (zip ld lc)
                   unfoldTillGuard k m (t:seen) defEnv $ swaps perm t0
-             _ -> return ty
+             _ -> return $ return ty
       _ -> error $ "[unfoldTillGuard]Definition "++(show t)++" not found."++(show defEnv)
 unfoldTillGuard k m  seen defEnv (New i bnd) =
   do (c,ty) <- unbind bnd
      nty <- let nm = if (length m) < k then c:m
                      else m
             in unfoldTillGuard k nm seen defEnv ty
-     return $ New i (bind c nty)
+     return $ return (New i (bind c (runFreshM nty))) -- Estoy perdiendo las variables frescas, esto creo que está mal!
 unfoldTillGuard  k m seen defEnv (ChanAbst bnd) =
   do (c,ty) <- unbind bnd
      nty <- unfoldTillGuard k m seen defEnv ty
-     return $ ChanAbst (bind c nty)
+     return $ return (ChanAbst (bind c (runFreshM nty))) -- ACA ESTOY TIRANDO EL EFECTO
 unfoldTillGuard  k m seen defEnv (Seq xs) = case xs of
   [x] -> unfoldTillGuard k m seen defEnv x
   [x,Null] -> unfoldTillGuard k m seen defEnv x
   otherwise -> error $ "[unfoldTillGuard] We don't deal with Seq yet: \n"++(pprintType $ Seq xs)
-unfoldTillGuard  k m seen defEnv t = return t
+unfoldTillGuard  k m seen defEnv t = return $ return t
 
 isTau :: GoType -> Bool
-isTau (Tau t) = True
+isTau (Tau _ t) = True
 isTau t = False
 
 getFreePars :: GoType -> M [GoType]
@@ -91,25 +96,25 @@ getFreePars t = return $ [t]
 
 
 getGuardsCont :: GoType -> [(GoType, GoType)]
-getGuardsCont (Send n t) = [(Send n Null, t)]
-getGuardsCont (Recv n t) = [(Recv n Null, t)]
-getGuardsCont (Tau t) = [(Tau Null, t)]
-getGuardsCont (IChoice t1 t2) = [(Tau Null, t1), (Tau Null, t2)]
+getGuardsCont (Send l n t) = [(Send l n Null, t)]
+getGuardsCont (Recv l n t) = [(Recv l n Null, t)]
+getGuardsCont (Tau l t) = [(Tau l Null, t)]
+getGuardsCont (IChoice t1 t2) = [(Tau 0 Null, t1), (Tau 0 Null, t2)]
 getGuardsCont (OChoice xs) = L.foldr (++) [] $ map getGuardsCont xs
-getGuardsCont (Close c ty) = [(Close c Null, ty)] 
+getGuardsCont (Close l c ty) = [(Close l c Null, ty)]
 getGuardsCont (Buffer c (open,b,k))
     | (b==0 && k==0)= [(ClosedBuffer c, Buffer c (False,b,k))]
-    | (k < b) && (k > 0) = [ (Send c Null, Buffer c (open,b,k-1))
-                           , (Recv c Null, Buffer c (open,b,k+1))
+    | (k < b) && (k > 0) = [ (Send 0 c Null, Buffer c (open,b,k-1))
+                           , (Recv 0 c Null, Buffer c (open,b,k+1))
                            , (ClosedBuffer c, Buffer c (False,b,k))
                            ]
-    | k > 0 = [(Send c Null, Buffer c (open,b,k-1))
+    | k > 0 = [(Send 0 c Null, Buffer c (open,b,k-1))
               , (ClosedBuffer c, Buffer c (False,b,k))
               ]
-    | k < b = [(Recv c Null, Buffer c (open,b,k+1))
+    | k < b = [(Recv 0 c Null, Buffer c (open,b,k+1))
               , (ClosedBuffer c, Buffer c (False,b,k))
               ]
-    | not open = [(Send c Null, Buffer c (open,b,k-1))
+    | not open = [(Send 0 c Null, Buffer c (open,b,k-1))
                  , (ClosedBuffer c, Buffer c (False,b,k))
                  ]
     | otherwise = [] 
@@ -129,9 +134,9 @@ compatibleConts xs ys =
 
 
 match :: GoType -> GoType -> Bool
-match ((Send c1 _)) ((Recv c2 _)) =  c1 == c2
-match ((Recv c2 _)) ((Send c1 _)) =  c1 == c2
-match ((Close c _)) ((ClosedBuffer c')) = c == c'
+match ((Send _ c1 _)) ((Recv _ c2 _)) =  c1 == c2
+match ((Recv _ c2 _)) ((Send _ c1 _)) =  c1 == c2
+match ((Close _ c _)) ((ClosedBuffer c')) = c == c'
 match _ _ = False
 
 
@@ -232,12 +237,9 @@ initiateChannels (New i bnd) =
      return $ if (i == -1)
               then  New i $ bind c ty -- no buffer if already created
               else  New (-1) $ bind c (Par [ty, Buffer c (True,i,0)])
-initiateChannels (Send c t) =  do t' <- initiateChannels t
-                                  return $ Send c t'
-initiateChannels (Recv c t) =  do t' <- initiateChannels t
-                                  return $ Recv c t'
-initiateChannels (Tau t) = do t' <- initiateChannels t
-                              return $ Tau t'
+initiateChannels (Send l c t) =  do t2 <- initiateChannels t; return $ Send l c t2
+initiateChannels (Recv l c t) =  do t2 <- initiateChannels t; return $ Recv l c t2
+initiateChannels (Tau l t) = do t2 <- initiateChannels t; return $ Tau l t2
 initiateChannels (IChoice t1 t2) =
   do  t1' <- initiateChannels t1
       t2' <- initiateChannels t2
@@ -249,8 +251,7 @@ initiateChannels (Par xs) =
   do ts <- mapM initiateChannels xs
      return $ Par ts
 initiateChannels Null = return Null
-initiateChannels (Close c t) = do t' <- initiateChannels t
-                                  return $ Close c t'
+initiateChannels (Close l c t) = do t2 <- initiateChannels t; return $ Close l c t2
 initiateChannels (TVar x) = return $ TVar x
 initiateChannels (Buffer c s) = return $ Buffer c s
 initiateChannels (ChanInst t lc) = do t' <- initiateChannels t

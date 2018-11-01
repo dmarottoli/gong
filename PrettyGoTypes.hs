@@ -41,15 +41,15 @@ amper = text "&"
 tau = text "tau"
 
 instance Pretty GoType where
-  ppr (Send c t) = do
+  ppr (Send l c t) = do
    t' <- ppr t
    c' <- ppr c
    return $ c' <> bang <> PP.semi <> t'
-  ppr (Recv c t) = do
+  ppr (Recv l c t) = do
    t' <- ppr t
    c' <- ppr c
    return $ c' <> qmark <> PP.semi <> t'
-  ppr (Tau t) = do
+  ppr (Tau l t) = do
    t' <- ppr t
    return $ tau <> PP.semi <> t'
   ppr (IChoice t1 t2) = do
@@ -69,7 +69,7 @@ instance Pretty GoType where
       t' <- ppr t
       return $ PP.text "new" <+> (PP.int i) <+> c' <> dot <> (PP.parens t')
   ppr (Null) = return $ text "0"
-  ppr (Close c t) = do
+  ppr (Close l c t) = do
       t' <- ppr t
       c' <- ppr c
       return $ PP.text "close " <> c' <> PP.semi <> t'

@@ -256,8 +256,8 @@ transformSeq vars (x:xs) =
     (Call _ s l) -> throwError l vars $
                   GT.Seq [(GT.ChanInst (GT.TVar (s2n s)) (L.map s2n l)), (transformSeq vars xs) ]
     
-    (Cl _ s) -> throwError [s] vars $
-              GT.Close (s2n s) (transformSeq vars xs)
+    (Cl line s) -> throwError [s] vars $
+              GT.Close line (s2n s) (transformSeq vars xs)
     
     (Spawn _ s l) -> throwError l vars $
                    GT.Par [(GT.ChanInst (GT.TVar (s2n s)) (L.map s2n l)) , (transformSeq vars xs)]
@@ -268,13 +268,13 @@ transformSeq vars (x:xs) =
     
     (Select l) -> GT.OChoice (L.map (transform vars) l)
     
-    (T _) -> GT.Tau (transformSeq vars xs)
+    (T line) -> GT.Tau line (transformSeq vars xs)
     
-    (S _ s) -> throwError [s] vars $
-             GT.Send (s2n s) (transformSeq vars xs)
+    (S line s) -> throwError [s] vars $
+             GT.Send line (s2n s) (transformSeq vars xs)
            
-    (R _ s) -> throwError [s] vars $
-             GT.Recv (s2n s) (transformSeq vars xs)
+    (R line s) -> throwError [s] vars $
+             GT.Recv line (s2n s) (transformSeq vars xs)
     (Zero) -> GT.Null  
 transformSeq vars [] = GT.Null
 

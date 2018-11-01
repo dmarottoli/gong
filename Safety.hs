@@ -20,16 +20,16 @@ import Debug.Trace
 
 
 getContinuation :: GoType -> Maybe [GoType]
-getContinuation (Close c ty) = Just [ty, Buffer c (False, 0,0)] -- DEAL WITH BUFFER
+getContinuation (Close _ c ty) = Just [ty, Buffer c (False, 0,0)] -- DEAL WITH BUFFER
 getContinuation _ = Nothing
 
 closebarbs :: GoType -> [GoType]
-closebarbs (Close c ty) = [Close c Null]
+closebarbs (Close l c ty) = [Close l c Null]
 closebarbs t = []
 
 forbiddenAction :: GoType -> [GoType]
-forbiddenAction (Send n t) = [Send n Null]
-forbiddenAction (Close c ty) = [Close c Null]
+forbiddenAction (Send l n t) = [Send l n Null]
+forbiddenAction (Close l c ty) = [Close l c Null]
 forbiddenAction (New i bnd) = let (c,ty) = unsafeUnbind bnd
                               in forbiddenAction ty
 forbiddenAction (Par xs) = L.foldr (++) [] $ L.map forbiddenAction xs
@@ -37,8 +37,8 @@ forbiddenAction t = []
 
 
 badmatch :: GoType -> GoType -> Bool
-badmatch (Close c ty) (Send n t) = c == n
-badmatch (Close c ty) (Close n t) = c == n
+badmatch (Close _ c ty) (Send _ n t) = c == n
+badmatch (Close _ c ty) (Close _ n t) = c == n
 badmatch _ _ = False
 
 
@@ -93,6 +93,35 @@ safety debug k eqs =
             if out
               then safety debug k $ return xs
               else if debug
-                   then error $ "Term not safe: " ++(show $ L.map pprintType ty)
+                   then error $ "Term not safe: " ++ show ty ++ "\n" ++ show (findCollidingOperations ty)
                    else return False
        [] -> return True
+
+
+thereIsASend :: [GoType] -> Bool
+thereIsASend xs = length (filter (\x -> case x of (Send l ch _) -> True; otherwise -> False) xs) > 0
+
+
+findCollidingOperations :: [GoType] -> String
+findCollidingOperations (x:xs) = case x of
+                            (Close line ch _) -> "There is a closing operation on line " ++ show line ++ " colliding with a " ++ collidingOperation xs ch
+                            (Send line ch _) -> "There is a send operation on line " ++ show line ++ " colliding with a " ++ nextCloseStatementLine xs ch
+                            otherwise -> findCollidingOperations xs
+
+-- we still need to check that the operations are done on the same channel
+collidingOperation :: [GoType] -> ChName -> String
+collidingOperation xs ch = let sends = filter (\x -> case x of (Send l ch _)-> True; otherwise -> False) xs in
+                            if (length sends) > 0
+                               then
+                                  case (head sends) of (Send line ch _) -> "send operation on line " ++ show line
+                               else
+                                  nextCloseStatementLine xs ch
+
+
+nextCloseStatementLine :: [GoType] -> ChName -> String
+nextCloseStatementLine xs ch = let closes = filter (\x -> case x of (Close l ch _)-> True; otherwise -> False) xs in
+                                    if (length closes) > 0
+                                        then
+                                            case (head closes) of (Close line _ _) -> "close operation on line " ++ show line
+                                        else
+                                            "unknown operation"

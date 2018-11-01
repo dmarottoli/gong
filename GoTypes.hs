@@ -36,15 +36,15 @@ type ChName = Name Channel
 type EqnName = Name GoType
 
 
-data GoType = Send ChName GoType
-            | Recv ChName GoType
-            | Tau GoType
+data GoType = Send Int ChName GoType
+            | Recv Int ChName GoType
+            | Tau Int GoType
             | IChoice GoType GoType -- Just two things?
             | OChoice [GoType]
             | Par [GoType]
             | New Int (Bind ChName GoType)
             | Null
-            | Close ChName GoType
+            | Close Int ChName GoType
             | TVar EqnName
             | ChanInst GoType [ChName] -- P(c)
             | ChanAbst (Bind [ChName] GoType) -- \c.P
@@ -164,15 +164,15 @@ gcNull t = t
 
 -- GC unused bound names --
 gcBNames' :: GoType -> M GoType
-gcBNames' (Send c t) = do
+gcBNames' (Send l c t) = do
   t' <- gcBNames' t
-  return $ Send c t'
-gcBNames' (Recv c t) = do
+  return $ Send l c t'
+gcBNames' (Recv l c t) = do
   t' <- gcBNames' t
-  return $ Recv c t'
-gcBNames' (Tau t) = do
+  return $ Recv l c t'
+gcBNames' (Tau l t) = do
   t' <- gcBNames' t
-  return $ Tau t'
+  return $ Tau l t'
 gcBNames' (IChoice t1 t2) = do
   t1' <- gcBNames' t1
   t2' <- gcBNames' t2
@@ -192,9 +192,9 @@ gcBNames' (New i bnd) = do
     else return (New i (bind c t'))                              
 gcBNames' (Null) = return Null
 gcBNames' buf@(Buffer c _) = return buf  
-gcBNames' (Close c t) = do
+gcBNames' (Close l c t) = do
   t' <- gcBNames' t
-  return $ Close c t'
+  return $ Close l c t'
 gcBNames' (TVar x) = return $ TVar x
 gcBNames' (ChanInst t lc) = do  -- P(~c)
   t' <- gcBNames' t
@@ -258,15 +258,15 @@ nf :: M GoType -> M GoType
 nf t = do t1 <- t
           (nf' (gcBNames t1))
    where nf' Null = return Null
-         nf' (Send c t) = do
+         nf' (Send l c t) = do
              t' <- nf' t
-             return $ (Send c t')
-         nf' (Recv c t) = do
+             return $ (Send l c t')
+         nf' (Recv l c t) = do
              t' <- nf' t
-             return $ (Recv c t')
-         nf' (Tau t) = do
+             return $ (Recv l c t')
+         nf' (Tau l t) = do
              t' <- nf' t
-             return $ (Tau t')
+             return $ (Tau l t')
          nf' (IChoice t1 t2) = do       
              t1' <- nf' t1
              t2' <- nf' t2
@@ -285,9 +285,9 @@ nf t = do t1 <- t
              (c,t) <- unbind bnd
              t' <- nf' t
              return $ (New i (bind c t'))
-         nf' (Close c t) = do
+         nf' (Close l c t) = do
              t' <- nf' t
-             return $ (Close c t')
+             return $ (Close l c t')
          nf' (TVar x) = return $ TVar x
          nf' t@(ChanInst t0 l) = return $ t
          nf' (ChanAbst bnd) = do
@@ -337,16 +337,16 @@ gcBuffer' names t = return t
 -- Once unfoldings of GoTypes and EquationSys --
 
 unfoldType :: GoType -> M GoType
-unfoldType (Send c t) = do
+unfoldType (Send l c t) = do
   t' <- unfoldType t
-  return $ Send c t'
-unfoldType (Recv c t) = do
+  return $ Send l c t'
+unfoldType (Recv l c t) = do
   t' <- unfoldType t
-  return $ Recv c t'
+  return $ Recv l c t'
   
-unfoldType (Tau t) = do
+unfoldType (Tau l t) = do
   t' <- unfoldType t
-  return $ Tau t'
+  return $ Tau l t'
 unfoldType (IChoice t1 t2) = do
   t1' <- unfoldType t1
   t2' <- unfoldType t2
@@ -365,9 +365,9 @@ unfoldType (New i bnd) = do
     then return t'
     else return (New i (bind c t'))                              
 unfoldType (Null) = return Null
-unfoldType (Close c t) = do
+unfoldType (Close l c t) = do
   t' <- unfoldType t
-  return $ Close c t'
+  return $ Close l c t'
 unfoldType (TVar x) = return $ TVar x
 unfoldType (ChanInst t lc) = do  -- P(~c)
   t' <- unfoldType t
@@ -432,9 +432,9 @@ finMem l1 l2 = not (null l1 || null l2 || (length l1 /= length l2)) &&
 
 checkFinite :: Bool -> [(EqnName , Embed GoType)] -> (Set EqnName) ->
                  [ChName] -> [ChName] ->  EqnName -> GoType -> M Bool
-checkFinite debug defEnv pRecs ys zs cDef (Send c t) = checkFinite debug defEnv pRecs ys zs cDef t
-checkFinite debug defEnv pRecs ys zs cDef (Recv c t) = checkFinite debug defEnv pRecs ys zs cDef t
-checkFinite debug defEnv pRecs ys zs cDef (Tau t)    = checkFinite debug defEnv pRecs ys zs cDef t
+checkFinite debug defEnv pRecs ys zs cDef (Send l c t) = checkFinite debug defEnv pRecs ys zs cDef t
+checkFinite debug defEnv pRecs ys zs cDef (Recv l c t) = checkFinite debug defEnv pRecs ys zs cDef t
+checkFinite debug defEnv pRecs ys zs cDef (Tau l t)    = checkFinite debug defEnv pRecs ys zs cDef t
 checkFinite debug defEnv pRecs ys zs cDef (IChoice t1 t2) = do
                              b1 <- checkFinite debug defEnv pRecs ys zs cDef t1
                              b2 <- checkFinite debug defEnv pRecs ys zs cDef t2
@@ -452,7 +452,7 @@ checkFinite debug defEnv pRecs ys zs cDef (New i bnd) = do
                               (c,t) <- unbind bnd
                               checkFinite debug defEnv pRecs ys zs cDef t
 checkFinite debug defEnv pRecs ys zs cDef (Null) = return $ True
-checkFinite debug defEnv pRecs ys zs cDef (Close c t) = checkFinite debug defEnv pRecs ys zs cDef t
+checkFinite debug defEnv pRecs ys zs cDef (Close l c t) = checkFinite debug defEnv pRecs ys zs cDef t
 checkFinite debug defEnv pRecs ys zs cDef t@(TVar x) = error $ "[checkFinite] Oops: "++(show t)
                                                  -- Should be handled in ChanInst
 checkFinite debug defEnv pRecs ys zs cDef (ChanInst (TVar x) l) =
