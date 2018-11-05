@@ -3,16 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="0ffb473f-feba-47ff-a3b3-46678e629185" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/GoParser.hs" afterPath="$PROJECT_DIR$/GoParser.hs" />
-      <change beforePath="$PROJECT_DIR$/GoTypes.hs" afterPath="$PROJECT_DIR$/GoTypes.hs" />
-      <change beforePath="$PROJECT_DIR$/Liveness.hs" afterPath="$PROJECT_DIR$/Liveness.hs" />
-      <change beforePath="$PROJECT_DIR$/PrettyGoTypes.hs" afterPath="$PROJECT_DIR$/PrettyGoTypes.hs" />
-      <change beforePath="$PROJECT_DIR$/Safety.hs" afterPath="$PROJECT_DIR$/Safety.hs" />
       <change beforePath="$PROJECT_DIR$/SymbolicSem.hs" afterPath="$PROJECT_DIR$/SymbolicSem.hs" />
-      <change beforePath="$PROJECT_DIR$/TypeSize.hs" afterPath="$PROJECT_DIR$/TypeSize.hs" />
-      <change beforePath="$PROJECT_DIR$/examples/not-safe.cgo" afterPath="$PROJECT_DIR$/examples/not-safe.cgo" />
-      <change beforePath="$PROJECT_DIR$/examples/simple.cgo" afterPath="$PROJECT_DIR$/examples/simple.cgo" />
-      <change beforePath="$PROJECT_DIR$/gong.cabal" afterPath="$PROJECT_DIR$/gong.cabal" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -86,8 +77,8 @@
       <file leaf-file-name="SymbolicSem.hs" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/SymbolicSem.hs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="443">
-              <caret line="80" column="11" lean-forward="false" selection-start-line="80" selection-start-column="11" selection-end-line="80" selection-end-column="11" />
+            <state relative-caret-position="345">
+              <caret line="200" column="51" lean-forward="true" selection-start-line="200" selection-start-column="51" selection-end-line="200" selection-end-column="51" />
               <folding />
             </state>
           </provider>
@@ -117,7 +108,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>getGuardsCont</find>
       <find>pprintType</find>
       <find>inList</find>
       <find>fullPass</find>
@@ -147,6 +137,7 @@
       <find>nf ::</find>
       <find>nfUnfold</find>
       <find>normalise</find>
+      <find>initiate ::</find>
     </findStrings>
   </component>
   <component name="GOROOT" path="/usr/local/go" />
@@ -666,8 +657,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/SymbolicSem.hs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="443">
-          <caret line="80" column="11" lean-forward="false" selection-start-line="80" selection-start-column="11" selection-end-line="80" selection-end-column="11" />
+        <state relative-caret-position="345">
+          <caret line="200" column="51" lean-forward="true" selection-start-line="200" selection-start-column="51" selection-end-line="200" selection-end-column="51" />
           <folding />
         </state>
       </provider>

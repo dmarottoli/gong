@@ -15,13 +15,16 @@ import Control.Monad.State
 import Control.Monad.Trans.Class
 import Control.Monad.IO.Class
 
+import Control.Monad.Reader
+
 -- DEBUG
 import System.IO.Unsafe
 import Debug.Trace
 
-
-
-
+--type FreshWithState a = State String (FreshM a)
+--
+--runFreshWithState :: Monad m => FreshWithState m a -> m a
+--runFreshWithState = runFreshMT . runState ""
 
 
 inList :: GoType -> [GoType] -> Bool
@@ -38,10 +41,11 @@ symCondition m b = S.null $ intersection (fromList m) (fromList b)
 
 
 
-normalise :: Int -> [ChName] -> Environment -> GoType -> GoType
+normalise :: Int -> [ChName] -> Environment -> GoType -> State String GoType
 normalise k names defEnv ty =
-  let t1 = nfUnfold k names [] defEnv ty
-  in runFreshM $ nf (gcBuffer . initiate $ evalState t1 "") -- Estoy tirando el estado. Dps usarlo para algo
+  do t1 <- nfUnfold k names [] defEnv ty
+     return $ runFreshM $ nf (gcBuffer . initiate $ t1))
+
 
 
 nfUnfold :: Int -> [ChName] -> [EqnName] -> Environment -> GoType -> State String (M GoType)
@@ -51,38 +55,40 @@ nfUnfold k m seen defEnv t =
 -- PILA
 unfoldTillGuard :: Int -> [ChName] -> [EqnName] -> Environment -> GoType -> State String (M GoType)
 unfoldTillGuard k m seen defEnv (Par xs) =
+--    return $ return Null
   do ys <- sequence (map (unfoldTillGuard k m seen defEnv) xs)
-     return $ return $ (Par (concat (sequence ys)))
-unfoldTillGuard k m  seen defEnv ori@(ChanInst (TVar t) lc)
-  | (symCondition m lc) || (t `L.elem` seen) = return $ return ori
-  | otherwise =
---  Acá es donde reemplaza la llamada a ChanInst TVar t por lo que hay en la lista de definiciones
-    case L.lookup t defEnv of
-      Just (Embed ty) ->
-           case ty of
-             ChanAbst bnd ->
-               do (ld,t0) <- unbind bnd
-                  let perm = L.foldr
-                             (\(d,c) acc -> compose acc (single (AnyName d) (AnyName c)))
-                             (Unbound.LocallyNameless.empty) (zip ld lc)
-                  unfoldTillGuard k m (t:seen) defEnv $ swaps perm t0
-             _ -> return $ return ty
-      _ -> error $ "[unfoldTillGuard]Definition "++(show t)++" not found."++(show defEnv)
-unfoldTillGuard k m  seen defEnv (New i bnd) =
-  do (c,ty) <- unbind bnd
-     nty <- let nm = if (length m) < k then c:m
-                     else m
-            in unfoldTillGuard k nm seen defEnv ty
-     return $ return (New i (bind c (runFreshM nty))) -- Estoy perdiendo las variables frescas, esto creo que está mal!
-unfoldTillGuard  k m seen defEnv (ChanAbst bnd) =
-  do (c,ty) <- unbind bnd
-     nty <- unfoldTillGuard k m seen defEnv ty
-     return $ return (ChanAbst (bind c (runFreshM nty))) -- ACA ESTOY TIRANDO EL EFECTO
-unfoldTillGuard  k m seen defEnv (Seq xs) = case xs of
-  [x] -> unfoldTillGuard k m seen defEnv x
-  [x,Null] -> unfoldTillGuard k m seen defEnv x
-  otherwise -> error $ "[unfoldTillGuard] We don't deal with Seq yet: \n"++(pprintType $ Seq xs)
-unfoldTillGuard  k m seen defEnv t = return $ return t
+     return $ do y <- sequence ys
+                 return $ (Par y)
+--unfoldTillGuard k m  seen defEnv ori@(ChanInst (TVar t) lc)
+--  | (symCondition m lc) || (t `L.elem` seen) = return $ return ori
+--  | otherwise =
+----  Acá es donde reemplaza la llamada a ChanInst TVar t por lo que hay en la lista de definiciones
+--    case L.lookup t defEnv of
+--      Just (Embed ty) ->
+--           case ty of
+--             ChanAbst bnd ->
+--               do (ld,t0) <- unbind bnd
+--                  let perm = L.foldr
+--                             (\(d,c) acc -> compose acc (single (AnyName d) (AnyName c)))
+--                             (Unbound.LocallyNameless.empty) (zip ld lc)
+--                  unfoldTillGuard k m (t:seen) defEnv $ swaps perm t0
+--             _ -> return $ return ty
+--      _ -> error $ "[unfoldTillGuard]Definition "++(show t)++" not found."++(show defEnv)
+--unfoldTillGuard k m  seen defEnv (New i bnd) =
+--  do (c,ty) <- unbind bnd
+--     nty <- let nm = if (length m) < k then c:m
+--                     else m
+--            in unfoldTillGuard k nm seen defEnv ty
+--     return $ return (New i (bind c (runFreshM nty))) -- Estoy perdiendo las variables frescas, esto creo que está mal!
+--unfoldTillGuard  k m seen defEnv (ChanAbst bnd) =
+--  do (c,ty) <- unbind bnd
+--     nty <- unfoldTillGuard k m seen defEnv ty
+--     return $ return (ChanAbst (bind c (runFreshM nty))) -- ACA ESTOY TIRANDO EL EFECTO
+--unfoldTillGuard  k m seen defEnv (Seq xs) = case xs of
+--  [x] -> unfoldTillGuard k m seen defEnv x
+--  [x,Null] -> unfoldTillGuard k m seen defEnv x
+--  otherwise -> error $ "[unfoldTillGuard] We don't deal with Seq yet: \n"++(pprintType $ Seq xs)
+--unfoldTillGuard  k m seen defEnv t = return $ return t
 
 isTau :: GoType -> Bool
 isTau (Tau _ t) = True
@@ -178,21 +184,24 @@ genParSuccs prev (x:xs) =
 
 
 
-genSuccs :: Environment -> GoType -> M [GoType]
-genSuccs defEnv (New i bnd) = do (c,ty) <- unbind bnd
-                                 ret <- (genSuccs defEnv ty)
-                                 return $ L.map (\t -> New i $ bind c t) ret
-genSuccs defEnv (Par xs) = return $ L.map (\x -> Par x) $ genParSuccs [] xs
-genSuccs defEnvt t = return $ L.map (\x -> Par x) $ genParSuccs [] [t]
+genSuccs :: Environment -> GoType -> M [State String GoType]
+genSuccs _ _ = return $ return []
+--genSuccs defEnv (New i bnd) = do (c,ty) <- unbind bnd
+--                                 ret <- (genSuccs defEnv ty)
+--                                 return $ L.map (\t -> New i $ bind c t) ret
+--genSuccs defEnv (Par xs) = return $ L.map (\x -> Par x) $ genParSuccs [] xs
+--genSuccs defEnvt t = return $ L.map (\x -> Par x) $ genParSuccs [] [t]
 
 
-genStates :: Int -> [ChName] -> Environment -> [GoType] -> [GoType] -> M [GoType]
-genStates k names env seen [] = return seen
-genStates k names env seen (x:xs)
+genStates :: Int -> [ChName] -> Environment -> [State String GoType] -> [GoType] -> M [State String GoType]
+genStates k names env seen [] = return $ seen
+genStates k names env seen (x:xs) =
+  do xx <- sequence seen
+     if x `inList` xx then genStates k names env seen xs
   | x `inList` seen = genStates k names env seen xs
-  | otherwise = do
-    next <- genSuccs env x
-    genStates k names env (x:seen) (xs++(L.map (normalise k names env) next))
+  | otherwise =
+      do next <- genSuccs env x
+                  genStates k names env (x:seen) (xs++(L.map (normalise k names env) next))
 
 
 succs :: Int -> Eqn -> M [Eqn]
