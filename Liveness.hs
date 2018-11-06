@@ -31,12 +31,12 @@ barbs (Recv l n t) = [Recv l n Null]
 barbs (OChoice xs) = L.foldr (++) [] $ L.map barbs xs
 barbs (New i bnd) = let (c,ty) = unsafeUnbind bnd
                     in barbs ty
-barbs (Par xs) = L.foldr (++) [] $ L.map barbs xs
+barbs (Par _ xs) = L.foldr (++) [] $ L.map barbs xs
 barbs (Buffer c (open,b,k))
-  | (k < b) && (k > 0) = [Send 0 c Null, Recv 0 c Null]
-  | k > 0 = [Send 0 c Null]
-  | k < b = [Recv 0 c Null]
-  | not open = [Send 0 c Null]
+  | (k < b) && (k > 0) = [Send "" c Null, Recv "" c Null]
+  | k > 0 = [Send "" c Null]
+  | k < b = [Recv "" c Null]
+  | not open = [Send "" c Null]
   | otherwise = [] 
 barbs t = []
 
@@ -83,7 +83,7 @@ checkStates names k sys prev (x:next) =
   if isBuffer x
   then checkStates names k sys (prev++[x]) next
   else
-    do  let temp = succsNode k names (EqnSys $ bind sys (Par (prev++next))) :: M [Eqn]
+    do  let temp = succsNode k names (EqnSys $ bind sys (Par "" (prev++next))) :: M [Eqn]
         nexts <- temp
         gotypes <- eqnToTypes temp
         rest <- (checkStates names k sys (prev++[x]) next)

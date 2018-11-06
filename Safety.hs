@@ -32,7 +32,7 @@ forbiddenAction (Send l n t) = [Send l n Null]
 forbiddenAction (Close l c ty) = [Close l c Null]
 forbiddenAction (New i bnd) = let (c,ty) = unsafeUnbind bnd
                               in forbiddenAction ty
-forbiddenAction (Par xs) = L.foldr (++) [] $ L.map forbiddenAction xs
+forbiddenAction (Par _ xs) = L.foldr (++) [] $ L.map forbiddenAction xs
 forbiddenAction t = []
 
 
@@ -70,7 +70,7 @@ checkAllSuccs names k sys prev [] = return True
 checkAllSuccs names k sys prev (x:next) =
   case getContinuation x of
     Just ty -> 
-      do  let temp = succsNode k names (EqnSys $ bind sys (Par (prev++ty++next))) :: M [Eqn]
+      do  let temp = succsNode k names (EqnSys $ bind sys (Par "" (prev++ty++next))) :: M [Eqn]
           nexts <- temp
           gotypes <- eqnToTypes temp
           rest <- (checkAllSuccs names k sys (prev++[x]) next)

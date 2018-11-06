@@ -36,19 +36,19 @@ type ChName = Name Channel
 type EqnName = Name GoType
 
 
-data GoType = Send Int ChName GoType
-            | Recv Int ChName GoType
-            | Tau Int GoType
+data GoType = Send String ChName GoType
+            | Recv String ChName GoType
+            | Tau String GoType
             | IChoice GoType GoType -- Just two things?
             | OChoice [GoType]
-            | Par [GoType]
+            | Par String [GoType]
             | New Int (Bind ChName GoType)
             | Null
-            | Close Int ChName GoType
+            | Close String ChName GoType
             | TVar EqnName
             | ChanInst GoType [ChName] -- P(c)
             | ChanAbst (Bind [ChName] GoType) -- \c.P
-            | Seq [GoType]
+            | Seq String [GoType]
             | Buffer ChName (Bool, Int, Int) -- True when Open, Bound, Current
             | ClosedBuffer ChName -- Only used for guard/label
     deriving (Show)
@@ -141,11 +141,11 @@ eqnl l t = EqnSys (bind (rec (L.map (\(var,plist,def) ->
 
 -- Flatten out Pars in Par (i.e. T | (S | R) == (T | S) | R)--
 flattenPar :: GoType -> GoType
-flattenPar (Par l) = Par (flattenPar' l)
+flattenPar (Par line l) = Par line (flattenPar' l)
     where flattenPar' (x:xs) = 
                       case x of
-                        Par l -> case (flattenPar x) of
-                                    Par l' -> l'++(flattenPar' xs)
+                        Par line l -> case (flattenPar x) of
+                                    Par line l' -> l'++(flattenPar' xs)
                                     t -> t:(flattenPar' xs)
                         _ -> x:(flattenPar' xs)  
           flattenPar' [] = []
@@ -153,8 +153,8 @@ flattenPar t = t
 
 -- Remove Nulls from Par (i.e.  T | 0 == T)--
 gcNull :: GoType -> GoType
-gcNull (Par l) = let res = gcNull' l in 
-       if (L.null res) then Null else Par res
+gcNull (Par line l) = let res = gcNull' l in
+       if (L.null res) then Null else Par line res
   where gcNull' (x:xs) =
                 case x of 
                      Null -> gcNull' xs
@@ -180,9 +180,9 @@ gcBNames' (IChoice t1 t2) = do
 gcBNames' (OChoice l) = do
  lm' <- mapM gcBNames' l
  return $ OChoice lm'
-gcBNames' (Par l) = do
+gcBNames' (Par line l) = do
  lm' <- mapM gcBNames' l
- return $ Par lm'
+ return $ Par line lm'
 gcBNames' (New i bnd) = do
   (c,t) <- unbind bnd
   t' <- gcBNames' t
@@ -203,9 +203,9 @@ gcBNames' (ChanAbst bnd) = do
   (c,t) <- unbind bnd
   t' <- gcBNames' t
   return $ ChanAbst (bind c t')
-gcBNames' (Seq l) = do
+gcBNames' (Seq line l) = do
   l' <- mapM gcBNames' l
-  return $ Seq l'
+  return $ Seq line l'
   
 
 gcBNames :: GoType -> GoType
@@ -245,11 +245,11 @@ closeBNames m  = do
   return $ L.foldr (\mc end ->
                     case mc of
                       Just(i,c) -> New i (bind c end)
-                      Nothing -> end) (Par ts) names'
+                      Nothing -> end) (Par "" ts) names' --Check THIS
 
 -- Composes open/close and escapes the freshness monad --
 pullBNamesPar :: GoType -> GoType
-pullBNamesPar (Par l) =
+pullBNamesPar (Par _ l) =
   runFreshM (closeBNames . openBNames $ l)
 pullBNamesPar t = t 
 
@@ -274,12 +274,12 @@ nf t = do t1 <- t
          nf' (OChoice l) = do
              l' <- mapM nf' l
              return $ OChoice l'
-         nf' t@(Par l) = do
+         nf' t@(Par line l) = do
              let t' = (gcNull . pullBNamesPar  . flattenPar $ t)
              case t' of
-              Par l' -> do 
+              Par line l' -> do
                           l'' <- mapM nf' l'
-                          return $ Par l''
+                          return $ Par line l''
               _ -> nf' t'
          nf' (New i bnd) = do
              (c,t) <- unbind bnd
@@ -294,9 +294,9 @@ nf t = do t1 <- t
              (l,t) <- unbind bnd
              t' <- nf' t
              return $ (ChanAbst (bind l t'))
-         nf' (Seq l) = do
+         nf' (Seq line l) = do
              l' <- mapM nf' l
-             return $ Seq l'
+             return $ Seq line l'
          nf' buf@(Buffer c _) = return buf
              
 
@@ -327,7 +327,7 @@ gcBuffer t = do t' <- t
                 gcBuffer' [] t'
 
 gcBuffer' :: [ChName] -> GoType -> M GoType
-gcBuffer' names (Par list) = return $ Par $ gcBufferList names [] list
+gcBuffer' names (Par line list) = return $ Par line $ gcBufferList names [] list
 gcBuffer' names (New i bnd) = do
   (c,t) <- unbind bnd
   t' <- gcBuffer' (c:names) t
@@ -354,9 +354,9 @@ unfoldType (IChoice t1 t2) = do
 unfoldType (OChoice l) = do
  lm' <- mapM unfoldType l
  return $ OChoice lm'
-unfoldType (Par l) = do
+unfoldType (Par line l) = do
  lm' <- mapM unfoldType l
- return $ Par lm'
+ return $ Par line lm'
 unfoldType (New i bnd) = do
   (c,t) <- unbind bnd
   t' <- unfoldType t
@@ -382,9 +382,9 @@ unfoldType (ChanAbst bnd) = do
   (c,t) <- unbind bnd
   t' <- unfoldType t
   return $ ChanAbst (bind c t')
-unfoldType (Seq l) = do
+unfoldType (Seq line l) = do
   l' <- mapM unfoldType l
-  return $ Seq l'
+  return $ Seq line l'
 
 
 unfoldEqn :: Eqn -> M Eqn
@@ -443,8 +443,8 @@ checkFinite debug defEnv pRecs ys zs cDef (OChoice l) = do
                              foldM (\acc t -> do
                                                b <- checkFinite debug defEnv pRecs ys zs cDef t
                                                return $ b && acc) True l
-checkFinite debug defEnv pRecs ys zs cDef (Par [t]) = checkFinite debug defEnv pRecs ys zs cDef t
-checkFinite debug defEnv pRecs ys zs cDef (Par l) = do
+checkFinite debug defEnv pRecs ys zs cDef (Par _ [t]) = checkFinite debug defEnv pRecs ys zs cDef t
+checkFinite debug defEnv pRecs ys zs cDef (Par _ l) = do
                              foldM (\acc t -> do
                                                b <- checkFinite debug defEnv pRecs [] (zs++ys) cDef t
                                                return $ b && acc) True l  
@@ -479,7 +479,7 @@ checkFinite debug defEnv pRecs ys zs cDef (ChanInst (TVar x) l) =
                                               (Unbound.LocallyNameless.empty) (zip params l)
                       checkFinite debug defEnv (S.insert x pRecs) ys zs cDef (swaps perm abs)
 checkFinite debug defEnv pRecs ys zs cDef (ChanAbst bnd) = return $ True -- this shouldn't come up here I think
-checkFinite debug defEnv pRecs ys zs cDef (Seq l) = do
+checkFinite debug defEnv pRecs ys zs cDef (Seq _ l) = do
                                foldM (\acc t -> do
                                                b <- checkFinite debug defEnv pRecs ys zs cDef t
                                                return $ b && acc) True l

@@ -45,9 +45,9 @@ nfUnfold k m seen defEnv t =
   unfoldTillGuard k m seen defEnv t
 
 unfoldTillGuard :: Int -> [ChName] -> [EqnName] -> Environment -> GoType -> M GoType
-unfoldTillGuard k m seen defEnv (Par xs) =
+unfoldTillGuard k m seen defEnv (Par line xs) =
   do ys <- (sequence (map (unfoldTillGuard k m seen defEnv) xs))
-     return $ Par ys
+     return $ Par line ys
 unfoldTillGuard k m  seen defEnv ori@(ChanInst (TVar t) lc)
   | (symCondition m lc) || (t `L.elem` seen) = return ori
   | otherwise =
@@ -73,10 +73,10 @@ unfoldTillGuard  k m seen defEnv (ChanAbst bnd) =
   do (c,ty) <- unbind bnd
      nty <- unfoldTillGuard k m seen defEnv ty
      return $ ChanAbst (bind c nty)
-unfoldTillGuard  k m seen defEnv (Seq xs) = case xs of
+unfoldTillGuard  k m seen defEnv (Seq line xs) = case xs of
   [x] -> unfoldTillGuard k m seen defEnv x
   [x,Null] -> unfoldTillGuard k m seen defEnv x
-  otherwise -> error $ "[unfoldTillGuard] We don't deal with Seq yet: \n"++(pprintType $ Seq xs)
+  otherwise -> error $ "[unfoldTillGuard] We don't deal with Seq yet: \n"++(pprintType $ Seq line xs)
 unfoldTillGuard  k m seen defEnv t = return t
 
 isTau :: GoType -> Bool
@@ -86,30 +86,30 @@ isTau t = False
 getFreePars :: GoType -> M [GoType]
 getFreePars (New i bnd) = do (c,ty) <- unbind bnd
                              getFreePars ty
-getFreePars (Par xs) = return $ xs
+getFreePars (Par _ xs) = return $ xs
 getFreePars t = return $ [t]
 
 
 getGuardsCont :: GoType -> [(GoType, GoType)]
-getGuardsCont (Send l n t) = [(Send l n Null, t)]
+getGuardsCont (Send l n t) = [(Send l n Null, t)] -- IMPORTANTE: Aca es cuando le tengo que pasar la línea del send a las cosas que vienen después secuencialmente
 getGuardsCont (Recv l n t) = [(Recv l n Null, t)]
 getGuardsCont (Tau l t) = [(Tau l Null, t)]
-getGuardsCont (IChoice t1 t2) = [(Tau 0 Null, t1), (Tau 0 Null, t2)]
+getGuardsCont (IChoice t1 t2) = [(Tau "" Null, t1), (Tau "" Null, t2)]
 getGuardsCont (OChoice xs) = L.foldr (++) [] $ map getGuardsCont xs
 getGuardsCont (Close l c ty) = [(Close l c Null, ty)]
 getGuardsCont (Buffer c (open,b,k))
     | (b==0 && k==0)= [(ClosedBuffer c, Buffer c (False,b,k))]
-    | (k < b) && (k > 0) = [ (Send 0 c Null, Buffer c (open,b,k-1))
-                           , (Recv 0 c Null, Buffer c (open,b,k+1))
+    | (k < b) && (k > 0) = [ (Send "" c Null, Buffer c (open,b,k-1))
+                           , (Recv "" c Null, Buffer c (open,b,k+1))
                            , (ClosedBuffer c, Buffer c (False,b,k))
                            ]
-    | k > 0 = [(Send 0 c Null, Buffer c (open,b,k-1))
+    | k > 0 = [(Send "" c Null, Buffer c (open,b,k-1))
               , (ClosedBuffer c, Buffer c (False,b,k))
               ]
-    | k < b = [(Recv 0 c Null, Buffer c (open,b,k+1))
+    | k < b = [(Recv "" c Null, Buffer c (open,b,k+1))
               , (ClosedBuffer c, Buffer c (False,b,k))
               ]
-    | not open = [(Send 0 c Null, Buffer c (open,b,k-1))
+    | not open = [(Send "" c Null, Buffer c (open,b,k-1))
                  , (ClosedBuffer c, Buffer c (False,b,k))
                  ]
     | otherwise = [] 
@@ -177,8 +177,8 @@ genSuccs :: Environment -> GoType -> M [GoType]
 genSuccs defEnv (New i bnd) = do (c,ty) <- unbind bnd
                                  ret <- (genSuccs defEnv ty)
                                  return $ L.map (\t -> New i $ bind c t) ret
-genSuccs defEnv (Par xs) = return $ L.map (\x -> Par x) $ genParSuccs [] xs
-genSuccs defEnvt t = return $ L.map (\x -> Par x) $ genParSuccs [] [t]
+genSuccs defEnv (Par line xs) = return $ L.map (\x -> Par line x) $ genParSuccs [] xs
+genSuccs defEnvt t = return $ L.map (\x -> Par "" x) $ genParSuccs [] [t] -- Here instead of instanciating the Paralel composition with empty line number it would be nice to have the line number of t. TODO: Create a function to get line number from gotype
 
 
 genStates :: Int -> [ChName] -> Environment -> [GoType] -> [GoType] -> M [GoType]
@@ -218,7 +218,7 @@ extractType ty =
                       then do (c,t) <- unbind bnd
                               extractType (return t)
                       else error $ "[extractType]Channels not initiated: "++(pprintType ty')
-       (Par xs) -> return xs
+       (Par _ xs) -> return xs
        otherwise -> return [ty']
 
 initiate :: M GoType -> M GoType
@@ -231,7 +231,7 @@ initiateChannels (New i bnd) =
      ty <- initiateChannels t
      return $ if (i == -1)
               then  New i $ bind c ty -- no buffer if already created
-              else  New (-1) $ bind c (Par [ty, Buffer c (True,i,0)])
+              else  New (-1) $ bind c (Par (show i) [ty, Buffer c (True,i,0)])
 initiateChannels (Send l c t) =  do t2 <- initiateChannels t; return $ Send l c t2
 initiateChannels (Recv l c t) =  do t2 <- initiateChannels t; return $ Recv l c t2
 initiateChannels (Tau l t) = do t2 <- initiateChannels t; return $ Tau l t2
@@ -242,9 +242,9 @@ initiateChannels (IChoice t1 t2) =
 initiateChannels (OChoice xs) =
   do ts <- mapM initiateChannels xs
      return $ OChoice ts
-initiateChannels (Par xs) = 
+initiateChannels (Par line xs) =
   do ts <- mapM initiateChannels xs
-     return $ Par ts
+     return $ Par line ts
 initiateChannels Null = return Null
 initiateChannels (Close l c t) = do t2 <- initiateChannels t; return $ Close l c t2
 initiateChannels (TVar x) = return $ TVar x
@@ -255,10 +255,10 @@ initiateChannels (ChanAbst bnd) =
   do (c,t) <- unbind bnd
      t' <- initiateChannels t
      return $ ChanAbst $ bind c t'
-initiateChannels (Seq [t]) = initiateChannels t
-initiateChannels (Seq [t,Null]) = initiateChannels t
-initiateChannels (Seq xs) = case last xs of
-  Null -> initiateChannels (Seq $ init xs)
+initiateChannels (Seq _ [t]) = initiateChannels t
+initiateChannels (Seq _ [t,Null]) = initiateChannels t
+initiateChannels (Seq line xs) = case last xs of
+  Null -> initiateChannels (Seq line $ init xs)
   otherwise ->  error $ "[initiateChannels] We don't deal with full Seq yet: "
                         ++(show $ L.map pprintType xs) 
 

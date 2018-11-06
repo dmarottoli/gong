@@ -24,7 +24,7 @@ symsemBound seen defEnv (Tau _ ty) = symsemBound seen defEnv ty
 symsemBound seen defEnv (IChoice ty1 ty2) =
   maximum [symsemBound seen defEnv ty1, symsemBound seen defEnv ty2]
 symsemBound seen defEnv (OChoice xs) = maximum (map (symsemBound seen defEnv) xs)
-symsemBound seen defEnv (Par xs) = maximum (map (symsemBound seen defEnv) xs)
+symsemBound seen defEnv (Par _ xs) = maximum (map (symsemBound seen defEnv) xs)
 symsemBound seen defEnv (New i bnd) = let (c,ty) = unsafeUnbind bnd
                         in 1 + symsemBound seen defEnv ty
 symsemBound seen defEnv (Null) = 0
@@ -37,7 +37,7 @@ symsemBound seen defEnv (ChanInst (TVar t) xs)
       _ -> error $ "[symsemBound]Definition "++(show t)++" not found."
 symsemBound seen defEnv (ChanAbst bnd) =  let (c,ty) = unsafeUnbind bnd
                               in symsemBound seen defEnv ty
-symsemBound seen defEnv (Seq xs) = sum (map (symsemBound seen defEnv) xs)
+symsemBound seen defEnv (Seq _ xs) = sum (map (symsemBound seen defEnv) xs)
 symsemBound seen defEnv (TVar eqs) = error "[symsemBound]TVAR"
 
 
@@ -50,7 +50,7 @@ sizeOfT seen defEnv (Tau _ ty) = sizeOfT seen defEnv ty
 sizeOfT seen defEnv (IChoice ty1 ty2) =
   maximum [sizeOfT seen defEnv ty1, sizeOfT seen defEnv ty2]
 sizeOfT seen defEnv (OChoice xs) = maximum (map (sizeOfT seen defEnv) xs)
-sizeOfT seen defEnv (Par xs) = L.foldr (+) 0 (map (sizeOfT seen defEnv) xs)
+sizeOfT seen defEnv (Par _ xs) = L.foldr (+) 0 (map (sizeOfT seen defEnv) xs)
 sizeOfT seen defEnv (New i bnd) = let (c,ty) = unsafeUnbind bnd
                         in  sizeOfT seen defEnv ty
 sizeOfT seen defEnv (Null) = 0
@@ -63,7 +63,7 @@ sizeOfT seen defEnv (ChanInst (TVar t) xs)
       _ -> error $ "[sizeOfT]Definition "++(show t)++" not found."
 sizeOfT seen defEnv (ChanAbst bnd) =  let (c,ty) = unsafeUnbind bnd
                               in sizeOfT seen defEnv ty
-sizeOfT seen defEnv (Seq xs) = sum (map (sizeOfT seen defEnv) xs)
+sizeOfT seen defEnv (Seq _ xs) = sum (map (sizeOfT seen defEnv) xs)
 sizeOfT seen defEnv (TVar eqs) = error "[sizeOfT]TVAR"
 
 
@@ -75,7 +75,7 @@ isRecPar seen defEnv (IChoice ty1 ty2) =
   maximum [isRecPar seen defEnv ty1, isRecPar seen defEnv ty2]
 isRecPar seen defEnv (OChoice xs) = maximum (map (isRecPar seen defEnv) xs)
 
-isRecPar seen defEnv (Par xs) =
+isRecPar seen defEnv (Par _ xs) =
   let (recs, notrecs) = partition (\x -> not $ L.null $ intersect seen (fvTyp x)) xs
       sizes = L.map (sizeOfT [] defEnv) notrecs
   in if L.null recs
@@ -93,7 +93,7 @@ isRecPar seen defEnv (ChanInst (TVar t) xs)
       _ -> error $ "[isRecPar]Definition "++(show t)++" not found."
 isRecPar seen defEnv (ChanAbst bnd) =  let (c,ty) = unsafeUnbind bnd
                               in isRecPar seen defEnv ty
-isRecPar seen defEnv (Seq xs) = sum (map (isRecPar seen defEnv) xs)
+isRecPar seen defEnv (Seq _ xs) = sum (map (isRecPar seen defEnv) xs)
 isRecPar seen defEnv (TVar eqs) = error "[isRecPar]TVAR"
 
 

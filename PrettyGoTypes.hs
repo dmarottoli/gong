@@ -60,7 +60,7 @@ instance Pretty GoType where
    l' <- mapM ppr l
    let prettyl = punctuate PP.comma l'
    return $ amper <> PP.braces (hsep prettyl)
-  ppr (Par l) = do
+  ppr (Par line l) = do
    l' <- mapM ppr l
    let prettyl = punctuate (PP.space <> PP.text "|") l'
    return $ (hsep prettyl)
@@ -84,7 +84,7 @@ instance Pretty GoType where
       l' <- mapM ppr lc
       let plist' = punctuate PP.comma l'
       return $ brackets (hsep plist') <+> t'
-  ppr (Seq l) = do
+  ppr (Seq line l) = do
     l' <- mapM ppr l
     let plist = punctuate PP.semi l'
     return $ hsep plist
