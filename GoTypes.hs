@@ -41,14 +41,14 @@ data GoType = Send Int ChName GoType
             | Tau Int GoType
             | IChoice GoType GoType -- Just two things?
             | OChoice [GoType]
-            | Par [GoType]
+            | Par Int [GoType]
             | New Int (Bind ChName GoType)
             | Null
             | Close Int ChName GoType
             | TVar EqnName
             | ChanInst GoType [ChName] -- P(c)
-            | ChanAbst (Bind [ChName] GoType) -- \c.P
-            | Seq [GoType]
+            | ChanAbst Int (Bind [ChName] GoType) -- \c.P
+            | Seq Int [GoType]
             | Buffer ChName (Bool, Int, Int) -- True when Open, Bound, Current
             | ClosedBuffer ChName -- Only used for guard/label
     deriving (Show)
