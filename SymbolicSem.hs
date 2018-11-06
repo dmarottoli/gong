@@ -11,10 +11,6 @@ import Unbound.LocallyNameless.Ops
 import Data.List as L
 import Data.Set as S (intersection, null, fromList)
 
-import Control.Monad.State
-import Control.Monad.Trans.Class
-import Control.Monad.IO.Class
-
 -- DEBUG
 import System.IO.Unsafe
 import Debug.Trace
@@ -41,20 +37,19 @@ symCondition m b = S.null $ intersection (fromList m) (fromList b)
 normalise :: Int -> [ChName] -> Environment -> GoType -> GoType
 normalise k names defEnv ty =
   let t1 = nfUnfold k names [] defEnv ty
-  in runFreshM $ nf (gcBuffer . initiate $ evalState t1 "") -- Estoy tirando el estado. Dps usarlo para algo
+  in runFreshM $ nf (gcBuffer . initiate $ t1)
 
 
-nfUnfold :: Int -> [ChName] -> [EqnName] -> Environment -> GoType -> State String (M GoType)
+nfUnfold :: Int -> [ChName] -> [EqnName] -> Environment -> GoType -> M GoType
 nfUnfold k m seen defEnv t =
   unfoldTillGuard k m seen defEnv t
 
--- PILA
-unfoldTillGuard :: Int -> [ChName] -> [EqnName] -> Environment -> GoType -> State String (M GoType)
+unfoldTillGuard :: Int -> [ChName] -> [EqnName] -> Environment -> GoType -> M GoType
 unfoldTillGuard k m seen defEnv (Par xs) =
-  do ys <- sequence (map (unfoldTillGuard k m seen defEnv) xs)
-     return $ return $ (Par (concat (sequence ys)))
+  do ys <- (sequence (map (unfoldTillGuard k m seen defEnv) xs))
+     return $ Par ys
 unfoldTillGuard k m  seen defEnv ori@(ChanInst (TVar t) lc)
-  | (symCondition m lc) || (t `L.elem` seen) = return $ return ori
+  | (symCondition m lc) || (t `L.elem` seen) = return ori
   | otherwise =
 --  Acá es donde reemplaza la llamada a ChanInst TVar t por lo que hay en la lista de definiciones
     case L.lookup t defEnv of
@@ -66,23 +61,23 @@ unfoldTillGuard k m  seen defEnv ori@(ChanInst (TVar t) lc)
                              (\(d,c) acc -> compose acc (single (AnyName d) (AnyName c)))
                              (Unbound.LocallyNameless.empty) (zip ld lc)
                   unfoldTillGuard k m (t:seen) defEnv $ swaps perm t0
-             _ -> return $ return ty
+             _ -> return ty
       _ -> error $ "[unfoldTillGuard]Definition "++(show t)++" not found."++(show defEnv)
 unfoldTillGuard k m  seen defEnv (New i bnd) =
   do (c,ty) <- unbind bnd
      nty <- let nm = if (length m) < k then c:m
                      else m
             in unfoldTillGuard k nm seen defEnv ty
-     return $ return (New i (bind c (runFreshM nty))) -- Estoy perdiendo las variables frescas, esto creo que está mal!
+     return $ New i (bind c nty)
 unfoldTillGuard  k m seen defEnv (ChanAbst bnd) =
   do (c,ty) <- unbind bnd
      nty <- unfoldTillGuard k m seen defEnv ty
-     return $ return (ChanAbst (bind c (runFreshM nty))) -- ACA ESTOY TIRANDO EL EFECTO
+     return $ ChanAbst (bind c nty)
 unfoldTillGuard  k m seen defEnv (Seq xs) = case xs of
   [x] -> unfoldTillGuard k m seen defEnv x
   [x,Null] -> unfoldTillGuard k m seen defEnv x
   otherwise -> error $ "[unfoldTillGuard] We don't deal with Seq yet: \n"++(pprintType $ Seq xs)
-unfoldTillGuard  k m seen defEnv t = return $ return t
+unfoldTillGuard  k m seen defEnv t = return t
 
 isTau :: GoType -> Bool
 isTau (Tau _ t) = True
