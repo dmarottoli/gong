@@ -45,7 +45,7 @@ data GoType = Send String ChName GoType
             | New Int (Bind ChName GoType)
             | Null
             | Close String ChName GoType
-            | TVar EqnName
+            | TVar String EqnName
             | ChanInst GoType [ChName] -- P(c)
             | ChanAbst (Bind [ChName] GoType) -- \c.P
             | Seq String [GoType]
@@ -53,6 +53,22 @@ data GoType = Send String ChName GoType
             | ClosedBuffer ChName -- Only used for guard/label
     deriving (Show)
 
+
+eqGT :: GoType -> GoType -> Bool
+eqGT Null Null = True
+eqGT (Send _ n1 t1) (Send _ n2 t2) = n1 `aeq` n2 && (eqGT t1 t2)
+eqGT (Recv _ n1 t1) (Recv _ n2 t2) = n1 `aeq` n2 && (eqGT t1 t2)
+eqGT (Tau _ t1) (Tau _ t2) =  eqGT t1 t2
+eqGT (IChoice t1 t2) (IChoice ta tb) = (eqGT t1 ta) && (eqGT t2 tb)
+eqGT (OChoice xs) (OChoice ys) = L.foldr (\p ac -> ac && (eqGT (fst p) (snd p))) True (L.zip xs ys)
+eqGT (Par _ xs) (Par _ ys) = L.foldr (\p ac -> ac && (eqGT (fst p) (snd p))) True (L.zip xs ys)
+eqGT (New _ t1) (New _ t2) = let (def1, main1) = runFreshM (unbind t1) in let (def2, main2) = runFreshM (unbind t2) in main1 `aeq` main2
+eqGT (Close _ name t) (Close _ name2 t2) = (name `aeq` name2) && (eqGT t t2)
+eqGT (TVar _ name1) (TVar _ name2) = name1 `aeq` name2
+eqGT (ChanInst t1 names1) (ChanInst t2 names2) = (eqGT t1 t2) && (names1 `aeq` names2)
+eqGT (ChanAbst t1) (ChanAbst t2) = let (def1, main1) = runFreshM (unbind t1) in let (def2, main2) = runFreshM (unbind t2) in main1 `aeq` main2
+eqGT (Seq _ xs) (Seq _ ys) = L.foldr (\p ac -> ac && (eqGT (fst p) (snd p))) True (L.zip xs ys)
+eqGT t1 t2 = t1 `aeq` t2
 
 isBuffer :: GoType -> Bool
 isBuffer (Buffer _ _) = True
@@ -79,7 +95,7 @@ instance Subst GoType Eqn
 --instance Subst String Eqn
 
 instance Subst GoType GoType where
-  isvar (TVar x) = Just (SubstName x)
+  isvar (TVar _ x) = Just (SubstName x)
   isvar _ = Nothing
 
 type M a = FreshM a
@@ -101,7 +117,7 @@ fvEqn e = fv e
 
 -- GoType Combinators (TVars, New, Chan Abs and Inst) --
 tvar :: String -> GoType
-tvar = TVar . s2n
+tvar = (TVar "") . s2n
 
 new :: Int -> String -> GoType -> GoType
 new i s t = New i $ bind (s2n s) t
@@ -195,7 +211,7 @@ gcBNames' buf@(Buffer c _) = return buf
 gcBNames' (Close l c t) = do
   t' <- gcBNames' t
   return $ Close l c t'
-gcBNames' (TVar x) = return $ TVar x
+gcBNames' (TVar line x) = return $ TVar line x
 gcBNames' (ChanInst t lc) = do  -- P(~c)
   t' <- gcBNames' t
   return $ ChanInst t' lc
@@ -288,7 +304,7 @@ nf t = do t1 <- t
          nf' (Close l c t) = do
              t' <- nf' t
              return $ (Close l c t')
-         nf' (TVar x) = return $ TVar x
+         nf' (TVar line x) = return $ TVar line x
          nf' t@(ChanInst t0 l) = return $ t
          nf' (ChanAbst bnd) = do
              (l,t) <- unbind bnd
@@ -368,7 +384,7 @@ unfoldType (Null) = return Null
 unfoldType (Close l c t) = do
   t' <- unfoldType t
   return $ Close l c t'
-unfoldType (TVar x) = return $ TVar x
+unfoldType (TVar line x) = return $ TVar line x
 unfoldType (ChanInst t lc) = do  -- P(~c)
   t' <- unfoldType t
   case t' of
@@ -453,9 +469,9 @@ checkFinite debug defEnv pRecs ys zs cDef (New i bnd) = do
                               checkFinite debug defEnv pRecs ys zs cDef t
 checkFinite debug defEnv pRecs ys zs cDef (Null) = return $ True
 checkFinite debug defEnv pRecs ys zs cDef (Close l c t) = checkFinite debug defEnv pRecs ys zs cDef t
-checkFinite debug defEnv pRecs ys zs cDef t@(TVar x) = error $ "[checkFinite] Oops: "++(show t)
+checkFinite debug defEnv pRecs ys zs cDef t@(TVar line x) = error $ "[checkFinite] Oops: "++(show t)
                                                  -- Should be handled in ChanInst
-checkFinite debug defEnv pRecs ys zs cDef (ChanInst (TVar x) l) =
+checkFinite debug defEnv pRecs ys zs cDef (ChanInst (TVar line x) l) =
                if (x == cDef) then
                  -- return $ ((not . null $ ys) || (l `finMem` zs))
                  if ((not . null $ ys) || (l `finMem` zs))

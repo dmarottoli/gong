@@ -68,7 +68,6 @@ main = do
                      let !tylist = runFreshM listsys
                      putStrLn $ "TyList Completa: " ++ show tylist
                      putStrLn $ "Len de la tylist: " ++ show (length tylist)
-                     putStrLn $ "Tylist " ++ show (head (tail tylist))
                      putStrLn $ "Bound (k): "++(show bound)
                      putStrLn $ "Number of k-states: "++(show $ length tylist)
                      when ((check pargs) ==  Debug || (check pargs)==List) $ do

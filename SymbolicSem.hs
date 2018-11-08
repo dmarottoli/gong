@@ -22,10 +22,10 @@ import Debug.Trace
 
 inList :: GoType -> [GoType] -> Bool
 inList t [] = False
-inList t (x:xs) = (t `aeq` x) ||  (inList t xs)
+inList t (x:xs) = (t `eqGT` x) ||  (inList t xs)
 
 
-  
+
 
 
 symCondition :: [ChName] -> [ChName] -> Bool
@@ -42,13 +42,13 @@ normalise k names defEnv ty =
 
 nfUnfold :: Int -> [ChName] -> [EqnName] -> Environment -> GoType -> M GoType
 nfUnfold k m seen defEnv t =
-  unfoldTillGuard k m seen defEnv t
+  unfoldTillGuard k m seen defEnv "" t
 
-unfoldTillGuard :: Int -> [ChName] -> [EqnName] -> Environment -> GoType -> M GoType
-unfoldTillGuard k m seen defEnv (Par line xs) =
-  do ys <- (sequence (map (unfoldTillGuard k m seen defEnv) xs))
+unfoldTillGuard :: Int -> [ChName] -> [EqnName] -> Environment -> String -> GoType -> M GoType
+unfoldTillGuard k m seen defEnv trace (Par line xs) =
+  do ys <- (sequence (map (unfoldTillGuard k m seen defEnv trace) xs))
      return $ Par line ys
-unfoldTillGuard k m  seen defEnv ori@(ChanInst (TVar t) lc)
+unfoldTillGuard k m  seen defEnv trace ori@(ChanInst (TVar line t) lc)
   | (symCondition m lc) || (t `L.elem` seen) = return ori
   | otherwise =
 --  Acá es donde reemplaza la llamada a ChanInst TVar t por lo que hay en la lista de definiciones
@@ -60,24 +60,26 @@ unfoldTillGuard k m  seen defEnv ori@(ChanInst (TVar t) lc)
                   let perm = L.foldr
                              (\(d,c) acc -> compose acc (single (AnyName d) (AnyName c)))
                              (Unbound.LocallyNameless.empty) (zip ld lc)
-                  unfoldTillGuard k m (t:seen) defEnv $ swaps perm t0
+                  unfoldTillGuard k m (t:seen) defEnv (line ++ ":" ++ trace) $ swaps perm t0
              _ -> return ty
       _ -> error $ "[unfoldTillGuard]Definition "++(show t)++" not found."++(show defEnv)
-unfoldTillGuard k m  seen defEnv (New i bnd) =
+unfoldTillGuard k m  seen defEnv trace (New i bnd) =
   do (c,ty) <- unbind bnd
      nty <- let nm = if (length m) < k then c:m
                      else m
-            in unfoldTillGuard k nm seen defEnv ty
+            in unfoldTillGuard k nm seen defEnv trace ty
      return $ New i (bind c nty)
-unfoldTillGuard  k m seen defEnv (ChanAbst bnd) =
+unfoldTillGuard  k m seen defEnv trace (ChanAbst bnd) =
   do (c,ty) <- unbind bnd
-     nty <- unfoldTillGuard k m seen defEnv ty
+     nty <- unfoldTillGuard k m seen defEnv trace ty
      return $ ChanAbst (bind c nty)
-unfoldTillGuard  k m seen defEnv (Seq line xs) = case xs of
-  [x] -> unfoldTillGuard k m seen defEnv x
-  [x,Null] -> unfoldTillGuard k m seen defEnv x
+unfoldTillGuard  k m seen defEnv trace (Seq line xs) = case xs of
+  [x] -> unfoldTillGuard k m seen defEnv trace x
+  [x,Null] -> unfoldTillGuard k m seen defEnv trace x
   otherwise -> error $ "[unfoldTillGuard] We don't deal with Seq yet: \n"++(pprintType $ Seq line xs)
-unfoldTillGuard  k m seen defEnv t = return t
+unfoldTillGuard  k m seen defEnv trace (Send line n t) = return $ Send (line++":"++trace) n t
+unfoldTillGuard  k m seen defEnv trace (Recv line n t) = return $ Recv (line++":"++trace) n t
+unfoldTillGuard  k m seen defEnv trace t = return t
 
 isTau :: GoType -> Bool
 isTau (Tau _ t) = True
@@ -247,7 +249,7 @@ initiateChannels (Par line xs) =
      return $ Par line ts
 initiateChannels Null = return Null
 initiateChannels (Close l c t) = do t2 <- initiateChannels t; return $ Close l c t2
-initiateChannels (TVar x) = return $ TVar x
+initiateChannels (TVar line x) = return $ TVar line x
 initiateChannels (Buffer c s) = return $ Buffer c s
 initiateChannels (ChanInst t lc) = do t' <- initiateChannels t
                                       return $ ChanInst t' lc

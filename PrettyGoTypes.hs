@@ -73,7 +73,7 @@ instance Pretty GoType where
       t' <- ppr t
       c' <- ppr c
       return $ PP.text "close " <> c' <> PP.semi <> t'
-  ppr (TVar x) = ppr x
+  ppr (TVar _ x) = ppr x
   ppr (ChanInst t plist) = do
       t' <- ppr t
       l' <- mapM ppr plist

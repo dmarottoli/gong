@@ -254,13 +254,13 @@ transformSeq :: [String] -> [Interm] -> GT.GoType
 transformSeq vars (x:xs) =
   case x of
     (Call line s l) -> throwError l vars $
-                  GT.Seq (show line) [(GT.ChanInst (GT.TVar (s2n s)) (L.map s2n l)), (transformSeq vars xs) ]
+                  GT.Seq (show line) [(GT.ChanInst (GT.TVar (show line) (s2n s)) (L.map s2n l)), (transformSeq vars xs) ]
     
     (Cl line s) -> throwError [s] vars $
               GT.Close (show line) (s2n s) (transformSeq vars xs)
     
     (Spawn line s l) -> throwError l vars $
-                   GT.Par (show line) [(GT.ChanInst (GT.TVar (s2n s)) (L.map s2n l)) , (transformSeq vars xs)]
+                   GT.Par (show line) [(GT.ChanInst (GT.TVar (show line) (s2n s)) (L.map s2n l)) , (transformSeq vars xs)]
 
     (NewChan _ s1 s2 n) -> GT.New (fromIntegral n) (bind (s2n s1) (transformSeq (s1:vars) xs))
     

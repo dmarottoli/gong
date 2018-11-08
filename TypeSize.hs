@@ -29,7 +29,7 @@ symsemBound seen defEnv (New i bnd) = let (c,ty) = unsafeUnbind bnd
                         in 1 + symsemBound seen defEnv ty
 symsemBound seen defEnv (Null) = 0
 symsemBound seen defEnv (Close _ _ ty) = symsemBound seen defEnv ty
-symsemBound seen defEnv (ChanInst (TVar t) xs)
+symsemBound seen defEnv (ChanInst (TVar line t) xs)
   | t `L.elem` seen = 0
   | otherwise =
     case L.lookup t defEnv of
@@ -38,7 +38,7 @@ symsemBound seen defEnv (ChanInst (TVar t) xs)
 symsemBound seen defEnv (ChanAbst bnd) =  let (c,ty) = unsafeUnbind bnd
                               in symsemBound seen defEnv ty
 symsemBound seen defEnv (Seq _ xs) = sum (map (symsemBound seen defEnv) xs)
-symsemBound seen defEnv (TVar eqs) = error "[symsemBound]TVAR"
+symsemBound seen defEnv (TVar _ eqs) = error "[symsemBound]TVAR"
 
 
 
@@ -55,7 +55,7 @@ sizeOfT seen defEnv (New i bnd) = let (c,ty) = unsafeUnbind bnd
                         in  sizeOfT seen defEnv ty
 sizeOfT seen defEnv (Null) = 0
 sizeOfT seen defEnv (Close _ _ ty) = sizeOfT seen defEnv ty
-sizeOfT seen defEnv (ChanInst (TVar t) xs)
+sizeOfT seen defEnv (ChanInst (TVar line t) xs)
   | t `L.elem` seen = 0
   | otherwise =
     case L.lookup t defEnv of
@@ -64,7 +64,7 @@ sizeOfT seen defEnv (ChanInst (TVar t) xs)
 sizeOfT seen defEnv (ChanAbst bnd) =  let (c,ty) = unsafeUnbind bnd
                               in sizeOfT seen defEnv ty
 sizeOfT seen defEnv (Seq _ xs) = sum (map (sizeOfT seen defEnv) xs)
-sizeOfT seen defEnv (TVar eqs) = error "[sizeOfT]TVAR"
+sizeOfT seen defEnv (TVar _ eqs) = error "[sizeOfT]TVAR"
 
 
 isRecPar :: [EqnName] -> Environment -> GoType -> Int
@@ -85,7 +85,7 @@ isRecPar seen defEnv (New i bnd) = let (c,ty) = unsafeUnbind bnd
                         in isRecPar seen defEnv ty
 isRecPar seen defEnv (Null) = 0
 isRecPar seen defEnv (Close _ _ ty) = isRecPar seen defEnv ty
-isRecPar seen defEnv (ChanInst (TVar t) xs)
+isRecPar seen defEnv (ChanInst (TVar line t) xs)
   | t `L.elem` seen = 0
   | otherwise =
     case L.lookup t defEnv of
@@ -94,7 +94,7 @@ isRecPar seen defEnv (ChanInst (TVar t) xs)
 isRecPar seen defEnv (ChanAbst bnd) =  let (c,ty) = unsafeUnbind bnd
                               in isRecPar seen defEnv ty
 isRecPar seen defEnv (Seq _ xs) = sum (map (isRecPar seen defEnv) xs)
-isRecPar seen defEnv (TVar eqs) = error "[isRecPar]TVAR"
+isRecPar seen defEnv (TVar _ eqs) = error "[isRecPar]TVAR"
 
 
 maxnestednames :: Eqn -> Int
