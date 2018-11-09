@@ -39,10 +39,10 @@ type EqnName = Name GoType
 data GoType = Send String ChName GoType
             | Recv String ChName GoType
             | Tau String GoType
-            | IChoice GoType GoType -- Just two things?
-            | OChoice [GoType]
+            | IChoice String GoType GoType -- Just two things?
+            | OChoice String [GoType]
             | Par String [GoType]
-            | New Int (Bind ChName GoType)
+            | New String Int (Bind ChName GoType)
             | Null
             | Close String ChName GoType
             | TVar String EqnName
@@ -59,16 +59,62 @@ eqGT Null Null = True
 eqGT (Send _ n1 t1) (Send _ n2 t2) = n1 `aeq` n2 && (eqGT t1 t2)
 eqGT (Recv _ n1 t1) (Recv _ n2 t2) = n1 `aeq` n2 && (eqGT t1 t2)
 eqGT (Tau _ t1) (Tau _ t2) =  eqGT t1 t2
-eqGT (IChoice t1 t2) (IChoice ta tb) = (eqGT t1 ta) && (eqGT t2 tb)
-eqGT (OChoice xs) (OChoice ys) = L.foldr (\p ac -> ac && (eqGT (fst p) (snd p))) True (L.zip xs ys)
+eqGT (IChoice _ t1 t2) (IChoice _ ta tb) = (eqGT t1 ta) && (eqGT t2 tb)
+eqGT (OChoice _ xs) (OChoice _ ys) = L.foldr (\p ac -> ac && (eqGT (fst p) (snd p))) True (L.zip xs ys)
 eqGT (Par _ xs) (Par _ ys) = L.foldr (\p ac -> ac && (eqGT (fst p) (snd p))) True (L.zip xs ys)
-eqGT (New _ t1) (New _ t2) = let (def1, main1) = runFreshM (unbind t1) in let (def2, main2) = runFreshM (unbind t2) in main1 `aeq` main2
+eqGT (New _ _ t1) (New _ _ t2) = let (def1, main1) = runFreshM (unbind t1) in let (def2, main2) = runFreshM (unbind t2) in main1 `eqGT` main2
 eqGT (Close _ name t) (Close _ name2 t2) = (name `aeq` name2) && (eqGT t t2)
 eqGT (TVar _ name1) (TVar _ name2) = name1 `aeq` name2
 eqGT (ChanInst t1 names1) (ChanInst t2 names2) = (eqGT t1 t2) && (names1 `aeq` names2)
-eqGT (ChanAbst t1) (ChanAbst t2) = let (def1, main1) = runFreshM (unbind t1) in let (def2, main2) = runFreshM (unbind t2) in main1 `aeq` main2
+eqGT (ChanAbst t1) (ChanAbst t2) = let (def1, main1) = runFreshM (unbind t1) in let (def2, main2) = runFreshM (unbind t2) in main1 `eqGT` main2
 eqGT (Seq _ xs) (Seq _ ys) = L.foldr (\p ac -> ac && (eqGT (fst p) (snd p))) True (L.zip xs ys)
 eqGT t1 t2 = t1 `aeq` t2
+
+addToLine :: GoType -> String -> GoType
+addToLine t "" = t
+addToLine (Send line n t) newLine = Send (line++":"++ (removeFirstColon newLine)) n t
+addToLine (Recv line n t) newLine = Recv (line++":"++(removeFirstColon newLine)) n t
+addToLine (Tau line t) newLine = Tau (line++":"++(removeFirstColon newLine)) t
+addToLine (IChoice line t1 t2) newLine = IChoice (line++":"++(removeFirstColon newLine)) t1 t2
+addToLine (OChoice line gts) newLine = OChoice (line++":"++(removeFirstColon newLine)) gts
+addToLine (Par line gts) newLine = Par (line++":"++(removeFirstColon newLine)) gts
+--addToLine (New line i b) newLine = New (line++":"++newLine) i b
+addToLine (New line i b) newLine = let (def1, main1) = runFreshM (unbind b) in New (line++":"++(removeFirstColon newLine)) i (bind def1 (addToLine main1 newLine))
+addToLine (Close line n t) newLine = Close (line++":"++(removeFirstColon newLine)) n t
+addToLine (TVar line eqn) newLine = TVar (line++":"++(removeFirstColon newLine)) eqn
+addToLine (ChanInst t names) newLine = ChanInst (addToLine t newLine) names
+addToLine (ChanAbst b) newLine = let (def1, main1) = runFreshM (unbind b) in ChanAbst (bind def1 (addToLine main1 newLine))
+addToLine (Seq line gts) newLine = Seq (line++":"++(removeFirstColon newLine)) gts
+addToLine t newLine = t
+
+getLineFromGT :: GoType -> String
+getLineFromGT (Send line _ _) = (getTopOfLineNumberStack line) ++ "S" ++ getRestOfLineNumberStack line
+getLineFromGT (Recv line _ _) = (getTopOfLineNumberStack line) ++ "R" ++ getRestOfLineNumberStack line
+getLineFromGT (Tau line _) = (getTopOfLineNumberStack line) ++ "T" ++ getRestOfLineNumberStack line
+getLineFromGT (IChoice line _ _) = (getTopOfLineNumberStack line) ++ "IF" ++ getRestOfLineNumberStack line
+getLineFromGT (OChoice line _) = (getTopOfLineNumberStack line) ++ "SEL" ++ getRestOfLineNumberStack line
+getLineFromGT (Par line _) = (getTopOfLineNumberStack line) ++"SPWN" ++ getRestOfLineNumberStack line
+getLineFromGT (Close line _ _) = (getTopOfLineNumberStack line) ++ "CL" ++ getRestOfLineNumberStack line
+getLineFromGT (TVar line _) = (getTopOfLineNumberStack line) ++ "CALL" ++ getRestOfLineNumberStack line
+getLineFromGT (Seq line _) = (getTopOfLineNumberStack line) ++ "SEQ" ++ getRestOfLineNumberStack line
+getLineFromGT t = ""
+
+getTopOfLineNumberStack :: String -> String
+getTopOfLineNumberStack "" = ""
+getTopOfLineNumberStack (s:ss) = if s == ':' then "" else [s] ++ (getTopOfLineNumberStack ss)
+
+getRestOfLineNumberStack :: String -> String
+getRestOfLineNumberStack "" = ""
+getRestOfLineNumberStack ":" = ""
+getRestOfLineNumberStack (s:ss) = if s == ':' then ":" ++ ss else getRestOfLineNumberStack ss
+
+removeFirstColon :: String -> String
+removeFirstColon "" = ""
+removeFirstColon (s:ss) = if s == ':' then ss else (s:ss)
+--
+--initTuned :: String -> String
+--initTuned "" = ""
+--initTuned ss = init ss
 
 isBuffer :: GoType -> Bool
 isBuffer (Buffer _ _) = True
@@ -117,10 +163,10 @@ fvEqn e = fv e
 
 -- GoType Combinators (TVars, New, Chan Abs and Inst) --
 tvar :: String -> GoType
-tvar = (TVar "") . s2n
+tvar = (TVar "t") . s2n
 
 new :: Int -> String -> GoType -> GoType
-new i s t = New i $ bind (s2n s) t
+new i s t = New "" i $ bind (s2n s) t
 
 chanAbst :: String -> GoType -> GoType
 chanAbst s t = ChanAbst $ bind ([s2n s]) t
@@ -189,23 +235,23 @@ gcBNames' (Recv l c t) = do
 gcBNames' (Tau l t) = do
   t' <- gcBNames' t
   return $ Tau l t'
-gcBNames' (IChoice t1 t2) = do
+gcBNames' (IChoice line t1 t2) = do
   t1' <- gcBNames' t1
   t2' <- gcBNames' t2
-  return $ IChoice t1' t2'
-gcBNames' (OChoice l) = do
+  return $ IChoice line t1' t2'
+gcBNames' (OChoice line l) = do
  lm' <- mapM gcBNames' l
- return $ OChoice lm'
+ return $ OChoice line lm'
 gcBNames' (Par line l) = do
  lm' <- mapM gcBNames' l
  return $ Par line lm'
-gcBNames' (New i bnd) = do
+gcBNames' (New line i bnd) = do
   (c,t) <- unbind bnd
   t' <- gcBNames' t
   -- GC if c not used
   if c `S.notMember` fv t' 
     then return t'
-    else return (New i (bind c t'))                              
+    else return (New line i (bind c t'))
 gcBNames' (Null) = return Null
 gcBNames' buf@(Buffer c _) = return buf  
 gcBNames' (Close l c t) = do
@@ -236,32 +282,36 @@ gcBNames = runFreshM . gcBNames'
 -- Open top-level bound names in a list of parallel types --
 -- return is a list of (mc,t) where mc is Nothing if t is
 -- closed and Just(c) otherwise.
-openBNames :: [GoType] -> M [([Maybe (Int, ChName)],GoType)]
+openBNames :: [GoType] -> M [([Maybe (Int, ChName)],(GoType,String))]
 openBNames (x:xs) = do
-     (l,t) <- openBNamesT x 
+     (l,t) <- openBNamesT x
      rest <- openBNames xs
-     return $ (l,t):rest    
-openBNames [] = return $ [([Nothing],Null)]
+     return $ (l,t):rest
+openBNames [] = return $ [([Nothing],(Null,""))]
 
-openBNamesT :: GoType -> M ([Maybe (Int, ChName)], GoType)
-openBNamesT (New i bnd) = do
+openBNamesT :: GoType -> M ([Maybe (Int, ChName)], (GoType, String))
+openBNamesT (New line i bnd) = do
             (c,t) <- unbind bnd
             (l,t') <- openBNamesT t
-            return $ ( Just(i,c):l , t')
-openBNamesT t = return $ ([Nothing],t)
+            return $ ( Just(i,c):l ,(fst t',line))
+openBNamesT t = return $ ([Nothing],(t,""))
     
 
 -- Reconstructs the appropriate GoType from calls
 -- to openBNames
-closeBNames ::  M [([Maybe (Int, ChName)],GoType)] -> M GoType
+closeBNames ::  M [([Maybe (Int, ChName)],(GoType, String))] -> M GoType
 closeBNames m  = do
   l <- m
   let (names,ts) = unzip l
   let names' = concat names
   return $ L.foldr (\mc end ->
                     case mc of
-                      Just(i,c) -> New i (bind c end)
-                      Nothing -> end) (Par "" ts) names' --Check THIS
+                      Just(i,c) -> New (snd (head ts)) i (bind c end)
+                      Nothing -> end) (Par "b" (getFirsts ts)) names' --Check THIS
+
+getFirsts :: [(GoType, String)] -> [GoType]
+getFirsts [] = []
+getFirsts (x:xs) = (fst x) : (getFirsts xs)
 
 -- Composes open/close and escapes the freshness monad --
 pullBNamesPar :: GoType -> GoType
@@ -283,13 +333,13 @@ nf t = do t1 <- t
          nf' (Tau l t) = do
              t' <- nf' t
              return $ (Tau l t')
-         nf' (IChoice t1 t2) = do       
+         nf' (IChoice line t1 t2) = do
              t1' <- nf' t1
              t2' <- nf' t2
-             return $ IChoice t1' t2'
-         nf' (OChoice l) = do
+             return $ IChoice line t1' t2'
+         nf' (OChoice line l) = do
              l' <- mapM nf' l
-             return $ OChoice l'
+             return $ OChoice line l'
          nf' t@(Par line l) = do
              let t' = (gcNull . pullBNamesPar  . flattenPar $ t)
              case t' of
@@ -297,10 +347,10 @@ nf t = do t1 <- t
                           l'' <- mapM nf' l'
                           return $ Par line l''
               _ -> nf' t'
-         nf' (New i bnd) = do
+         nf' (New line i bnd) = do
              (c,t) <- unbind bnd
              t' <- nf' t
-             return $ (New i (bind c t'))
+             return $ (New line i (bind c t'))
          nf' (Close l c t) = do
              t' <- nf' t
              return $ (Close l c t')
@@ -344,10 +394,10 @@ gcBuffer t = do t' <- t
 
 gcBuffer' :: [ChName] -> GoType -> M GoType
 gcBuffer' names (Par line list) = return $ Par line $ gcBufferList names [] list
-gcBuffer' names (New i bnd) = do
+gcBuffer' names (New line i bnd) = do
   (c,t) <- unbind bnd
   t' <- gcBuffer' (c:names) t
-  return $ New i (bind c t')
+  return $ New line i (bind c t')
 gcBuffer' names t = return t
 
 -- Once unfoldings of GoTypes and EquationSys --
@@ -363,23 +413,23 @@ unfoldType (Recv l c t) = do
 unfoldType (Tau l t) = do
   t' <- unfoldType t
   return $ Tau l t'
-unfoldType (IChoice t1 t2) = do
+unfoldType (IChoice line t1 t2) = do
   t1' <- unfoldType t1
   t2' <- unfoldType t2
-  return $ IChoice t1' t2'
-unfoldType (OChoice l) = do
+  return $ IChoice line t1' t2'
+unfoldType (OChoice line l) = do
  lm' <- mapM unfoldType l
- return $ OChoice lm'
+ return $ OChoice line lm'
 unfoldType (Par line l) = do
  lm' <- mapM unfoldType l
  return $ Par line lm'
-unfoldType (New i bnd) = do
+unfoldType (New line i bnd) = do
   (c,t) <- unbind bnd
   t' <- unfoldType t
   -- GC if c not used
   if c `S.notMember` fv t'
     then return t'
-    else return (New i (bind c t'))                              
+    else return (New line i (bind c t'))
 unfoldType (Null) = return Null
 unfoldType (Close l c t) = do
   t' <- unfoldType t
@@ -451,11 +501,11 @@ checkFinite :: Bool -> [(EqnName , Embed GoType)] -> (Set EqnName) ->
 checkFinite debug defEnv pRecs ys zs cDef (Send l c t) = checkFinite debug defEnv pRecs ys zs cDef t
 checkFinite debug defEnv pRecs ys zs cDef (Recv l c t) = checkFinite debug defEnv pRecs ys zs cDef t
 checkFinite debug defEnv pRecs ys zs cDef (Tau l t)    = checkFinite debug defEnv pRecs ys zs cDef t
-checkFinite debug defEnv pRecs ys zs cDef (IChoice t1 t2) = do
+checkFinite debug defEnv pRecs ys zs cDef (IChoice _ t1 t2) = do
                              b1 <- checkFinite debug defEnv pRecs ys zs cDef t1
                              b2 <- checkFinite debug defEnv pRecs ys zs cDef t2
                              return $ b1 && b2
-checkFinite debug defEnv pRecs ys zs cDef (OChoice l) = do
+checkFinite debug defEnv pRecs ys zs cDef (OChoice _ l) = do
                              foldM (\acc t -> do
                                                b <- checkFinite debug defEnv pRecs ys zs cDef t
                                                return $ b && acc) True l
@@ -464,7 +514,7 @@ checkFinite debug defEnv pRecs ys zs cDef (Par _ l) = do
                              foldM (\acc t -> do
                                                b <- checkFinite debug defEnv pRecs [] (zs++ys) cDef t
                                                return $ b && acc) True l  
-checkFinite debug defEnv pRecs ys zs cDef (New i bnd) = do
+checkFinite debug defEnv pRecs ys zs cDef (New _ i bnd) = do
                               (c,t) <- unbind bnd
                               checkFinite debug defEnv pRecs ys zs cDef t
 checkFinite debug defEnv pRecs ys zs cDef (Null) = return $ True

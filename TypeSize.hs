@@ -21,11 +21,11 @@ symsemBound :: [EqnName] -> Environment -> GoType -> Int
 symsemBound seen defEnv (Send _ _ ty) = symsemBound seen defEnv ty
 symsemBound seen defEnv (Recv _ _ ty) = symsemBound seen defEnv ty
 symsemBound seen defEnv (Tau _ ty) = symsemBound seen defEnv ty
-symsemBound seen defEnv (IChoice ty1 ty2) =
+symsemBound seen defEnv (IChoice _ ty1 ty2) =
   maximum [symsemBound seen defEnv ty1, symsemBound seen defEnv ty2]
-symsemBound seen defEnv (OChoice xs) = maximum (map (symsemBound seen defEnv) xs)
+symsemBound seen defEnv (OChoice _ xs) = maximum (map (symsemBound seen defEnv) xs)
 symsemBound seen defEnv (Par _ xs) = maximum (map (symsemBound seen defEnv) xs)
-symsemBound seen defEnv (New i bnd) = let (c,ty) = unsafeUnbind bnd
+symsemBound seen defEnv (New _ i bnd) = let (c,ty) = unsafeUnbind bnd
                         in 1 + symsemBound seen defEnv ty
 symsemBound seen defEnv (Null) = 0
 symsemBound seen defEnv (Close _ _ ty) = symsemBound seen defEnv ty
@@ -47,11 +47,11 @@ sizeOfT :: [EqnName] -> Environment -> GoType -> Int
 sizeOfT seen defEnv (Send _ _ ty) =  1 + (sizeOfT seen defEnv ty)
 sizeOfT seen defEnv (Recv _ _ ty) = 1 + (sizeOfT seen defEnv ty)
 sizeOfT seen defEnv (Tau _ ty) = sizeOfT seen defEnv ty
-sizeOfT seen defEnv (IChoice ty1 ty2) =
+sizeOfT seen defEnv (IChoice _ ty1 ty2) =
   maximum [sizeOfT seen defEnv ty1, sizeOfT seen defEnv ty2]
-sizeOfT seen defEnv (OChoice xs) = maximum (map (sizeOfT seen defEnv) xs)
+sizeOfT seen defEnv (OChoice _ xs) = maximum (map (sizeOfT seen defEnv) xs)
 sizeOfT seen defEnv (Par _ xs) = L.foldr (+) 0 (map (sizeOfT seen defEnv) xs)
-sizeOfT seen defEnv (New i bnd) = let (c,ty) = unsafeUnbind bnd
+sizeOfT seen defEnv (New _ i bnd) = let (c,ty) = unsafeUnbind bnd
                         in  sizeOfT seen defEnv ty
 sizeOfT seen defEnv (Null) = 0
 sizeOfT seen defEnv (Close _ _ ty) = sizeOfT seen defEnv ty
@@ -71,9 +71,9 @@ isRecPar :: [EqnName] -> Environment -> GoType -> Int
 isRecPar seen defEnv (Send _ _ ty) = isRecPar seen defEnv ty
 isRecPar seen defEnv (Recv _ _ ty) = isRecPar seen defEnv ty
 isRecPar seen defEnv (Tau _ ty) = isRecPar seen defEnv ty
-isRecPar seen defEnv (IChoice ty1 ty2) =
+isRecPar seen defEnv (IChoice _ ty1 ty2) =
   maximum [isRecPar seen defEnv ty1, isRecPar seen defEnv ty2]
-isRecPar seen defEnv (OChoice xs) = maximum (map (isRecPar seen defEnv) xs)
+isRecPar seen defEnv (OChoice _ xs) = maximum (map (isRecPar seen defEnv) xs)
 
 isRecPar seen defEnv (Par _ xs) =
   let (recs, notrecs) = partition (\x -> not $ L.null $ intersect seen (fvTyp x)) xs
@@ -81,7 +81,7 @@ isRecPar seen defEnv (Par _ xs) =
   in if L.null recs
      then 0
      else maximum (0:sizes)
-isRecPar seen defEnv (New i bnd) = let (c,ty) = unsafeUnbind bnd
+isRecPar seen defEnv (New _ i bnd) = let (c,ty) = unsafeUnbind bnd
                         in isRecPar seen defEnv ty
 isRecPar seen defEnv (Null) = 0
 isRecPar seen defEnv (Close _ _ ty) = isRecPar seen defEnv ty

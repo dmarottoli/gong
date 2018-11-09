@@ -5,11 +5,11 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change beforePath="$PROJECT_DIR$/GoParser.hs" afterPath="$PROJECT_DIR$/GoParser.hs" />
       <change beforePath="$PROJECT_DIR$/GoTypes.hs" afterPath="$PROJECT_DIR$/GoTypes.hs" />
-      <change beforePath="$PROJECT_DIR$/Gong.hs" afterPath="$PROJECT_DIR$/Gong.hs" />
+      <change beforePath="$PROJECT_DIR$/Liveness.hs" afterPath="$PROJECT_DIR$/Liveness.hs" />
       <change beforePath="$PROJECT_DIR$/PrettyGoTypes.hs" afterPath="$PROJECT_DIR$/PrettyGoTypes.hs" />
+      <change beforePath="$PROJECT_DIR$/Safety.hs" afterPath="$PROJECT_DIR$/Safety.hs" />
       <change beforePath="$PROJECT_DIR$/SymbolicSem.hs" afterPath="$PROJECT_DIR$/SymbolicSem.hs" />
       <change beforePath="$PROJECT_DIR$/TypeSize.hs" afterPath="$PROJECT_DIR$/TypeSize.hs" />
-      <change beforePath="$PROJECT_DIR$/examples/primesieve.cgo" afterPath="$PROJECT_DIR$/examples/primesieve.cgo" />
       <change beforePath="$PROJECT_DIR$/examples/simple.cgo" afterPath="$PROJECT_DIR$/examples/simple.cgo" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -24,8 +24,8 @@
       <file leaf-file-name="Gong.hs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Gong.hs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="413">
-              <caret line="97" column="48" lean-forward="false" selection-start-line="97" selection-start-column="48" selection-end-line="97" selection-end-column="48" />
+            <state relative-caret-position="293">
+              <caret line="71" column="66" lean-forward="false" selection-start-line="68" selection-start-column="66" selection-end-line="71" selection-end-column="66" />
               <folding />
             </state>
           </provider>
@@ -34,8 +34,8 @@
       <file leaf-file-name="Liveness.hs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Liveness.hs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="465">
-              <caret line="43" column="30" lean-forward="false" selection-start-line="43" selection-start-column="30" selection-end-line="43" selection-end-column="30" />
+            <state relative-caret-position="127">
+              <caret line="32" column="22" lean-forward="false" selection-start-line="32" selection-start-column="22" selection-end-line="32" selection-end-column="22" />
               <folding />
             </state>
           </provider>
@@ -44,8 +44,8 @@
       <file leaf-file-name="TypeSize.hs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/TypeSize.hs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="238">
-              <caret line="31" column="39" lean-forward="false" selection-start-line="31" selection-start-column="35" selection-end-line="31" selection-end-column="39" />
+            <state relative-caret-position="671">
+              <caret line="83" column="27" lean-forward="false" selection-start-line="83" selection-start-column="27" selection-end-line="83" selection-end-column="27" />
               <folding />
             </state>
           </provider>
@@ -64,8 +64,8 @@
       <file leaf-file-name="Safety.hs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Safety.hs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="473">
-              <caret line="72" column="95" lean-forward="false" selection-start-line="72" selection-start-column="95" selection-end-line="72" selection-end-column="95" />
+            <state relative-caret-position="277">
+              <caret line="32" column="22" lean-forward="false" selection-start-line="32" selection-start-column="22" selection-end-line="32" selection-end-column="22" />
               <folding />
             </state>
           </provider>
@@ -74,28 +74,28 @@
       <file leaf-file-name="PrettyGoTypes.hs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/PrettyGoTypes.hs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="238">
-              <caret line="75" column="11" lean-forward="false" selection-start-line="75" selection-start-column="7" selection-end-line="75" selection-end-column="11" />
+            <state relative-caret-position="733">
+              <caret line="66" column="12" lean-forward="false" selection-start-line="66" selection-start-column="12" selection-end-line="66" selection-end-column="12" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SymbolicSem.hs" pinned="false" current-in-tab="true">
+      <file leaf-file-name="SymbolicSem.hs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/SymbolicSem.hs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="463">
-              <caret line="90" column="17" lean-forward="false" selection-start-line="90" selection-start-column="13" selection-end-line="90" selection-end-column="17" />
+            <state relative-caret-position="930">
+              <caret line="80" column="0" lean-forward="false" selection-start-line="80" selection-start-column="0" selection-end-line="80" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="GoTypes.hs" pinned="false" current-in-tab="false">
+      <file leaf-file-name="GoTypes.hs" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/GoTypes.hs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="551">
-              <caret line="68" column="121" lean-forward="false" selection-start-line="68" selection-start-column="121" selection-end-line="68" selection-end-column="121" />
+            <state relative-caret-position="373">
+              <caret line="113" column="0" lean-forward="true" selection-start-line="113" selection-start-column="2" selection-end-line="116" selection-end-column="24" />
               <folding />
             </state>
           </provider>
@@ -104,8 +104,8 @@
       <file leaf-file-name="GoParser.hs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/GoParser.hs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="463">
-              <caret line="280" column="50" lean-forward="false" selection-start-line="280" selection-start-column="50" selection-end-line="280" selection-end-column="50" />
+            <state relative-caret-position="986">
+              <caret line="267" column="48" lean-forward="false" selection-start-line="267" selection-start-column="48" selection-end-line="267" selection-end-column="48" />
               <folding />
             </state>
           </provider>
@@ -115,36 +115,36 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>Term not</find>
-      <find>EqnSys</find>
-      <find>extractT</find>
-      <find>putStrLn</find>
-      <find>extract</find>
-      <find>Safety ::</find>
-      <find>qmark</find>
-      <find>succsNode ::</find>
-      <find>Close Int</find>
-      <find>compatibleConts</find>
-      <find>Either</find>
-      <find>succs ::</find>
-      <find>succs</find>
-      <find>putStrL</find>
-      <find>Embed</find>
-      <find>runFreshM</find>
-      <find>Par</find>
-      <find>nfUnfold</find>
-      <find>normalise</find>
-      <find>TVAR</find>
-      <find>aeq ::</find>
-      <find>nf ::</find>
       <find>aeq</find>
-      <find>Tvar</find>
       <find>unbind</find>
       <find>inList</find>
-      <find>Send</find>
       <find>seen</find>
       <find>PRU</find>
+      <find>Par &quot;</find>
+      <find>Tvar &quot;</find>
+      <find>Par &quot;b</find>
+      <find>CloseBNames</find>
+      <find>closeBNames</find>
+      <find>0</find>
+      <find>Send</find>
+      <find>Par</find>
+      <find>Ochoice</find>
+      <find>Ichoice</find>
       <find>TVar</find>
+      <find>I</find>
+      <find>Tvar</find>
+      <find>succs ::</find>
+      <find>gcBuffer ::</find>
+      <find>gcBuffer</find>
+      <find>&quot;IF</find>
+      <find>&quot;IF&quot;</find>
+      <find>IChoice</find>
+      <find>addToLine</find>
+      <find>Select</find>
+      <find>preserve</find>
+      <find>\+\+&quot;:&quot;\+\+</find>
+      <find>New</find>
+      <find>match</find>
     </findStrings>
   </component>
   <component name="GOROOT" path="/usr/local/go" />
@@ -154,15 +154,15 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/Liveness.hs" />
-        <option value="$PROJECT_DIR$/Safety.hs" />
-        <option value="$PROJECT_DIR$/Gong.hs" />
-        <option value="$PROJECT_DIR$/GoParser.hs" />
+        <option value="$PROJECT_DIR$/StuffParams.hs" />
         <option value="$PROJECT_DIR$/PrettyGoTypes.hs" />
         <option value="$PROJECT_DIR$/TypeSize.hs" />
-        <option value="$PROJECT_DIR$/StuffParams.hs" />
-        <option value="$PROJECT_DIR$/GoTypes.hs" />
+        <option value="$PROJECT_DIR$/Liveness.hs" />
+        <option value="$PROJECT_DIR$/Safety.hs" />
+        <option value="$PROJECT_DIR$/GoParser.hs" />
+        <option value="$PROJECT_DIR$/Gong.hs" />
         <option value="$PROJECT_DIR$/SymbolicSem.hs" />
+        <option value="$PROJECT_DIR$/GoTypes.hs" />
       </list>
     </option>
   </component>
@@ -609,30 +609,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Safety.hs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="473">
-          <caret line="72" column="95" lean-forward="false" selection-start-line="72" selection-start-column="95" selection-end-line="72" selection-end-column="95" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/TypeSize.hs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
-          <caret line="31" column="39" lean-forward="false" selection-start-line="31" selection-start-column="35" selection-end-line="31" selection-end-column="39" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Liveness.hs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="465">
-          <caret line="43" column="30" lean-forward="false" selection-start-line="43" selection-start-column="30" selection-end-line="43" selection-end-column="30" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/StuffParams.hs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="472">
@@ -641,42 +617,66 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/TypeSize.hs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="671">
+          <caret line="83" column="27" lean-forward="false" selection-start-line="83" selection-start-column="27" selection-end-line="83" selection-end-column="27" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Liveness.hs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="127">
+          <caret line="32" column="22" lean-forward="false" selection-start-line="32" selection-start-column="22" selection-end-line="32" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Safety.hs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="277">
+          <caret line="32" column="22" lean-forward="false" selection-start-line="32" selection-start-column="22" selection-end-line="32" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/PrettyGoTypes.hs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
-          <caret line="75" column="11" lean-forward="false" selection-start-line="75" selection-start-column="7" selection-end-line="75" selection-end-column="11" />
+        <state relative-caret-position="733">
+          <caret line="66" column="12" lean-forward="false" selection-start-line="66" selection-start-column="12" selection-end-line="66" selection-end-column="12" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Gong.hs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="413">
-          <caret line="97" column="48" lean-forward="false" selection-start-line="97" selection-start-column="48" selection-end-line="97" selection-end-column="48" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/GoTypes.hs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="551">
-          <caret line="68" column="121" lean-forward="false" selection-start-line="68" selection-start-column="121" selection-end-line="68" selection-end-column="121" />
+        <state relative-caret-position="293">
+          <caret line="71" column="66" lean-forward="false" selection-start-line="68" selection-start-column="66" selection-end-line="71" selection-end-column="66" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/GoParser.hs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="463">
-          <caret line="280" column="50" lean-forward="false" selection-start-line="280" selection-start-column="50" selection-end-line="280" selection-end-column="50" />
+        <state relative-caret-position="986">
+          <caret line="267" column="48" lean-forward="false" selection-start-line="267" selection-start-column="48" selection-end-line="267" selection-end-column="48" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/SymbolicSem.hs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="463">
-          <caret line="90" column="17" lean-forward="false" selection-start-line="90" selection-start-column="13" selection-end-line="90" selection-end-column="17" />
+        <state relative-caret-position="930">
+          <caret line="80" column="0" lean-forward="false" selection-start-line="80" selection-start-column="0" selection-end-line="80" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/GoTypes.hs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="373">
+          <caret line="113" column="0" lean-forward="true" selection-start-line="113" selection-start-column="2" selection-end-line="116" selection-end-column="24" />
           <folding />
         </state>
       </provider>

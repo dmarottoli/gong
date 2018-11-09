@@ -28,9 +28,9 @@ import Debug.Trace
 barbs :: GoType -> [GoType]
 barbs (Send l n t) = [Send l n Null]
 barbs (Recv l n t) = [Recv l n Null]
-barbs (OChoice xs) = L.foldr (++) [] $ L.map barbs xs
-barbs (New i bnd) = let (c,ty) = unsafeUnbind bnd
-                    in barbs ty
+barbs (OChoice _ xs) = L.foldr (++) [] $ L.map barbs xs
+barbs (New _ i bnd) = let (c,ty) = unsafeUnbind bnd
+                      in barbs ty
 barbs (Par _ xs) = L.foldr (++) [] $ L.map barbs xs
 barbs (Buffer c (open,b,k))
   | (k < b) && (k > 0) = [Send "" c Null, Recv "" c Null]
@@ -55,7 +55,7 @@ matchTypes current candidate =
 
 findMatch :: GoType -> [GoType] -> Bool
 findMatch _ [] = False
-findMatch t@(OChoice ys) (x:xs) = if any isTau ys
+findMatch t@(OChoice _ ys) (x:xs) = if any isTau ys
                                   then True
                                   else (matchTypes t x)
                                        ||
@@ -83,7 +83,7 @@ checkStates names k sys prev (x:next) =
   if isBuffer x
   then checkStates names k sys (prev++[x]) next
   else
-    do  let temp = succsNode k names (EqnSys $ bind sys (Par "" (prev++next))) :: M [Eqn]
+    do  let temp = succsNode k names (EqnSys $ bind sys (Par "l" (prev++next))) :: M [Eqn]
         nexts <- temp
         gotypes <- eqnToTypes temp
         rest <- (checkStates names k sys (prev++[x]) next)

@@ -40,7 +40,7 @@ data Interm = Seq [Interm]
               | Spawn Int String [String]
               | NewChan Int String String Integer
               | If Int Interm Interm
-              | Select [Interm]
+              | Select Int [Interm]
               | T Int
               | S Int String
               | R Int String
@@ -141,9 +141,12 @@ itparser =
             return $ Spawn l x list }
   <|>
   do { reserved "select"
+     ; symbol "@"
+     ; line <- many $ P.digit
      ; l <- many (reserved "case" *> seqInterm)
      ; reserved "endselect"
-     ; return $ Select l }
+     ; let li = read line :: Int in
+            return $ Select li l }
   <|>
   do { reserved "let"
      ; x <- identifier
@@ -218,13 +221,13 @@ parseTest s =
 contzElim :: Interm -> Interm
 contzElim (Seq l) = Seq (contzElim' l)
 contzElim (If l p1 p2) = If l (contzElim p1) (contzElim p2)
-contzElim (Select l) = Select (L.map contzElim l)
+contzElim (Select line l) = Select line (L.map contzElim l)
 contzElim p = p
 
 contzElim' (x:y:xs) = case (x,y) of
                         (Call _ _ _ , Zero) -> [x] -- No need to keep going
                         (If l p1 p2, Zero) -> [If l (contzElim p1) (contzElim p2)]
-                        (Select l , Zero) -> [Select (L.map contzElim l)]
+                        (Select line l , Zero) -> [Select line (L.map contzElim l)]
                         (_,_) -> (contzElim x):(contzElim' (y:xs))
 contzElim' ([x]) = [contzElim x]
 contzElim' [] = []
@@ -262,11 +265,11 @@ transformSeq vars (x:xs) =
     (Spawn line s l) -> throwError l vars $
                    GT.Par (show line) [(GT.ChanInst (GT.TVar (show line) (s2n s)) (L.map s2n l)) , (transformSeq vars xs)]
 
-    (NewChan _ s1 s2 n) -> GT.New (fromIntegral n) (bind (s2n s1) (transformSeq (s1:vars) xs))
+    (NewChan line s1 s2 n) -> GT.New (show line) (fromIntegral n) (bind (s2n s1) (transformSeq (s1:vars) xs))
     
-    (If _ p1 p2) -> GT.IChoice (transform vars p1) (transform vars p2)
+    (If line p1 p2) -> GT.IChoice (show line) (transform vars p1) (transform vars p2)
     
-    (Select l) -> GT.OChoice (L.map (transform vars) l)
+    (Select line l) -> GT.OChoice (show line) (L.map (transform vars) l)
     
     (T line) -> GT.Tau (show line) (transformSeq vars xs)
     

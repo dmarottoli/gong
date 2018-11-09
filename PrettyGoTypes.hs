@@ -52,11 +52,11 @@ instance Pretty GoType where
   ppr (Tau l t) = do
    t' <- ppr t
    return $ tau <> PP.semi <> t'
-  ppr (IChoice t1 t2) = do
+  ppr (IChoice _ t1 t2) = do
    t1' <- ppr t1
    t2' <- ppr t2
    return $ oplus <> PP.braces (t1' <+> PP.comma <+> t2')
-  ppr (OChoice l) = do
+  ppr (OChoice _ l) = do
    l' <- mapM ppr l
    let prettyl = punctuate PP.comma l'
    return $ amper <> PP.braces (hsep prettyl)
@@ -64,7 +64,7 @@ instance Pretty GoType where
    l' <- mapM ppr l
    let prettyl = punctuate (PP.space <> PP.text "|") l'
    return $ (hsep prettyl)
-  ppr (New i bnd) = lunbind bnd $ \(c,t) -> do
+  ppr (New _ i bnd) = lunbind bnd $ \(c,t) -> do
       c' <- ppr c
       t' <- ppr t
       return $ PP.text "new" <+> (PP.int i) <+> c' <> dot <> (PP.parens t')
