@@ -5,12 +5,14 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change beforePath="$PROJECT_DIR$/GoParser.hs" afterPath="$PROJECT_DIR$/GoParser.hs" />
       <change beforePath="$PROJECT_DIR$/GoTypes.hs" afterPath="$PROJECT_DIR$/GoTypes.hs" />
+      <change beforePath="$PROJECT_DIR$/Gong.hs" afterPath="$PROJECT_DIR$/Gong.hs" />
       <change beforePath="$PROJECT_DIR$/Liveness.hs" afterPath="$PROJECT_DIR$/Liveness.hs" />
-      <change beforePath="$PROJECT_DIR$/PrettyGoTypes.hs" afterPath="$PROJECT_DIR$/PrettyGoTypes.hs" />
-      <change beforePath="$PROJECT_DIR$/Safety.hs" afterPath="$PROJECT_DIR$/Safety.hs" />
       <change beforePath="$PROJECT_DIR$/SymbolicSem.hs" afterPath="$PROJECT_DIR$/SymbolicSem.hs" />
-      <change beforePath="$PROJECT_DIR$/TypeSize.hs" afterPath="$PROJECT_DIR$/TypeSize.hs" />
+      <change beforePath="$PROJECT_DIR$/examples/.fibonacci.cfgo.swp" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/examples/nofence.cgo" afterPath="$PROJECT_DIR$/examples/nofence.cgo" />
+      <change beforePath="$PROJECT_DIR$/examples/primesieve.cgo" afterPath="$PROJECT_DIR$/examples/primesieve.cgo" />
       <change beforePath="$PROJECT_DIR$/examples/simple.cgo" afterPath="$PROJECT_DIR$/examples/simple.cgo" />
+      <change beforePath="$PROJECT_DIR$/gong.cabal" afterPath="$PROJECT_DIR$/gong.cabal" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -24,8 +26,8 @@
       <file leaf-file-name="Gong.hs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Gong.hs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="293">
-              <caret line="71" column="66" lean-forward="false" selection-start-line="68" selection-start-column="66" selection-end-line="71" selection-end-column="66" />
+            <state relative-caret-position="690">
+              <caret line="91" column="39" lean-forward="false" selection-start-line="91" selection-start-column="39" selection-end-line="91" selection-end-column="39" />
               <folding />
             </state>
           </provider>
@@ -34,8 +36,8 @@
       <file leaf-file-name="Liveness.hs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Liveness.hs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="127">
-              <caret line="32" column="22" lean-forward="false" selection-start-line="32" selection-start-column="22" selection-end-line="32" selection-end-column="22" />
+            <state relative-caret-position="598">
+              <caret line="118" column="44" lean-forward="false" selection-start-line="118" selection-start-column="36" selection-end-line="118" selection-end-column="44" />
               <folding />
             </state>
           </provider>
@@ -44,8 +46,8 @@
       <file leaf-file-name="TypeSize.hs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/TypeSize.hs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="671">
-              <caret line="83" column="27" lean-forward="false" selection-start-line="83" selection-start-column="27" selection-end-line="83" selection-end-column="27" />
+            <state relative-caret-position="-109">
+              <caret line="34" column="29" lean-forward="false" selection-start-line="34" selection-start-column="29" selection-end-line="34" selection-end-column="29" />
               <folding />
             </state>
           </provider>
@@ -54,8 +56,8 @@
       <file leaf-file-name="StuffParams.hs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/StuffParams.hs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="472">
-              <caret line="240" column="38" lean-forward="false" selection-start-line="240" selection-start-column="38" selection-end-line="240" selection-end-column="38" />
+            <state relative-caret-position="-2752">
+              <caret line="362" column="5" lean-forward="false" selection-start-line="362" selection-start-column="5" selection-end-line="362" selection-end-column="5" />
               <folding />
             </state>
           </provider>
@@ -64,7 +66,7 @@
       <file leaf-file-name="Safety.hs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Safety.hs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="277">
+            <state relative-caret-position="-570">
               <caret line="32" column="22" lean-forward="false" selection-start-line="32" selection-start-column="22" selection-end-line="32" selection-end-column="22" />
               <folding />
             </state>
@@ -74,7 +76,7 @@
       <file leaf-file-name="PrettyGoTypes.hs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/PrettyGoTypes.hs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="733">
+            <state relative-caret-position="990">
               <caret line="66" column="12" lean-forward="false" selection-start-line="66" selection-start-column="12" selection-end-line="66" selection-end-column="12" />
               <folding />
             </state>
@@ -84,8 +86,8 @@
       <file leaf-file-name="SymbolicSem.hs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/SymbolicSem.hs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="930">
-              <caret line="80" column="0" lean-forward="false" selection-start-line="80" selection-start-column="0" selection-end-line="80" selection-end-column="0" />
+            <state relative-caret-position="-2138">
+              <caret line="19" column="33" lean-forward="false" selection-start-line="19" selection-start-column="33" selection-end-line="19" selection-end-column="37" />
               <folding />
             </state>
           </provider>
@@ -94,8 +96,8 @@
       <file leaf-file-name="GoTypes.hs" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/GoTypes.hs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="373">
-              <caret line="113" column="0" lean-forward="true" selection-start-line="113" selection-start-column="2" selection-end-line="116" selection-end-column="24" />
+            <state relative-caret-position="-60">
+              <caret line="32" column="26" lean-forward="false" selection-start-line="32" selection-start-column="19" selection-end-line="32" selection-end-column="26" />
               <folding />
             </state>
           </provider>
@@ -104,8 +106,8 @@
       <file leaf-file-name="GoParser.hs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/GoParser.hs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="986">
-              <caret line="267" column="48" lean-forward="false" selection-start-line="267" selection-start-column="48" selection-end-line="267" selection-end-column="48" />
+            <state relative-caret-position="313">
+              <caret line="265" column="22" lean-forward="false" selection-start-line="265" selection-start-column="22" selection-end-line="265" selection-end-column="22" />
               <folding />
             </state>
           </provider>
@@ -115,37 +117,41 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>aeq</find>
-      <find>unbind</find>
-      <find>inList</find>
-      <find>seen</find>
-      <find>PRU</find>
-      <find>Par &quot;</find>
-      <find>Tvar &quot;</find>
-      <find>Par &quot;b</find>
-      <find>CloseBNames</find>
-      <find>closeBNames</find>
-      <find>0</find>
-      <find>Send</find>
-      <find>Par</find>
-      <find>Ochoice</find>
-      <find>Ichoice</find>
-      <find>TVar</find>
-      <find>I</find>
-      <find>Tvar</find>
+      <find>findMatch</find>
+      <find>matchTypes</find>
+      <find>extractType ::</find>
+      <find>getGuardsCont</find>
+      <find>succsNode</find>
+      <find>normalize</find>
+      <find>matchTy</find>
+      <find>match ::</find>
+      <find>trace</find>
+      <find>maxnestednames</find>
+      <find>symsemBound</find>
+      <find>sizeOfEqs</find>
+      <find>extractType</find>
+      <find>sizeOfT</find>
       <find>succs ::</find>
       <find>gcBuffer ::</find>
+      <find>nfUnfold</find>
       <find>gcBuffer</find>
-      <find>&quot;IF</find>
-      <find>&quot;IF&quot;</find>
-      <find>IChoice</find>
-      <find>addToLine</find>
-      <find>Select</find>
-      <find>preserve</find>
-      <find>\+\+&quot;:&quot;\+\+</find>
-      <find>New</find>
-      <find>match</find>
+      <find>normalise</find>
+      <find>swaps</find>
+      <find>getLineFromSynched</find>
+      <find>transform</find>
+      <find>&quot;Close</find>
+      <find>check ::</find>
+      <find>notSynch</find>
+      <find>blockingG</find>
+      <find>eqGT</find>
+      <find>unfoldT</find>
+      <find>ChName</find>
+      <find>inList</find>
     </findStrings>
+    <replaceStrings>
+      <replace>removeFirstNewLine</replace>
+      <replace>replaceNewLines</replace>
+    </replaceStrings>
   </component>
   <component name="GOROOT" path="/usr/local/go" />
   <component name="Git.Settings">
@@ -156,13 +162,13 @@
       <list>
         <option value="$PROJECT_DIR$/StuffParams.hs" />
         <option value="$PROJECT_DIR$/PrettyGoTypes.hs" />
-        <option value="$PROJECT_DIR$/TypeSize.hs" />
-        <option value="$PROJECT_DIR$/Liveness.hs" />
         <option value="$PROJECT_DIR$/Safety.hs" />
         <option value="$PROJECT_DIR$/GoParser.hs" />
+        <option value="$PROJECT_DIR$/Liveness.hs" />
+        <option value="$PROJECT_DIR$/TypeSize.hs" />
         <option value="$PROJECT_DIR$/Gong.hs" />
-        <option value="$PROJECT_DIR$/SymbolicSem.hs" />
         <option value="$PROJECT_DIR$/GoTypes.hs" />
+        <option value="$PROJECT_DIR$/SymbolicSem.hs" />
       </list>
     </option>
   </component>
@@ -175,8 +181,8 @@
   <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="113" />
     <option name="y" value="40" />
-    <option name="width" value="1336" />
-    <option name="height" value="801" />
+    <option name="width" value="1320" />
+    <option name="height" value="793" />
   </component>
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="" version="1">
@@ -209,7 +215,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../plastic-jay/ayabot" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../nickng/gong" />
     <property name="go.sdk.automatically.set" value="true" />
     <property name="SearchEverywhereHistoryKey" value="GoPar&#9;FILE&#9;file:///home/damifur/go/src/github.com/nickng/gong/GoParser.hs" />
   </component>
@@ -232,34 +238,23 @@
     <frame x="-1" y="0" width="1602" height="873" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.13875" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.050625" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32901555" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32901555" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32901555" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.050625" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32901555" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -609,74 +604,74 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/PrettyGoTypes.hs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="990">
+          <caret line="66" column="12" lean-forward="false" selection-start-line="66" selection-start-column="12" selection-end-line="66" selection-end-column="12" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/StuffParams.hs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="472">
-          <caret line="240" column="38" lean-forward="false" selection-start-line="240" selection-start-column="38" selection-end-line="240" selection-end-column="38" />
+        <state relative-caret-position="-2752">
+          <caret line="362" column="5" lean-forward="false" selection-start-line="362" selection-start-column="5" selection-end-line="362" selection-end-column="5" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/TypeSize.hs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="671">
-          <caret line="83" column="27" lean-forward="false" selection-start-line="83" selection-start-column="27" selection-end-line="83" selection-end-column="27" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Liveness.hs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="127">
-          <caret line="32" column="22" lean-forward="false" selection-start-line="32" selection-start-column="22" selection-end-line="32" selection-end-column="22" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Safety.hs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="277">
-          <caret line="32" column="22" lean-forward="false" selection-start-line="32" selection-start-column="22" selection-end-line="32" selection-end-column="22" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/PrettyGoTypes.hs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="733">
-          <caret line="66" column="12" lean-forward="false" selection-start-line="66" selection-start-column="12" selection-end-line="66" selection-end-column="12" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Gong.hs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="293">
-          <caret line="71" column="66" lean-forward="false" selection-start-line="68" selection-start-column="66" selection-end-line="71" selection-end-column="66" />
+        <state relative-caret-position="-109">
+          <caret line="34" column="29" lean-forward="false" selection-start-line="34" selection-start-column="29" selection-end-line="34" selection-end-column="29" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/GoParser.hs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="986">
-          <caret line="267" column="48" lean-forward="false" selection-start-line="267" selection-start-column="48" selection-end-line="267" selection-end-column="48" />
+        <state relative-caret-position="313">
+          <caret line="265" column="22" lean-forward="false" selection-start-line="265" selection-start-column="22" selection-end-line="265" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Safety.hs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-570">
+          <caret line="32" column="22" lean-forward="false" selection-start-line="32" selection-start-column="22" selection-end-line="32" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Liveness.hs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="598">
+          <caret line="118" column="44" lean-forward="false" selection-start-line="118" selection-start-column="36" selection-end-line="118" selection-end-column="44" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Gong.hs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="690">
+          <caret line="91" column="39" lean-forward="false" selection-start-line="91" selection-start-column="39" selection-end-line="91" selection-end-column="39" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/SymbolicSem.hs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="930">
-          <caret line="80" column="0" lean-forward="false" selection-start-line="80" selection-start-column="0" selection-end-line="80" selection-end-column="0" />
+        <state relative-caret-position="-2138">
+          <caret line="19" column="33" lean-forward="false" selection-start-line="19" selection-start-column="33" selection-end-line="19" selection-end-column="37" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/GoTypes.hs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="373">
-          <caret line="113" column="0" lean-forward="true" selection-start-line="113" selection-start-column="2" selection-end-line="116" selection-end-column="24" />
+        <state relative-caret-position="-60">
+          <caret line="32" column="26" lean-forward="false" selection-start-line="32" selection-start-column="19" selection-end-line="32" selection-end-column="26" />
           <folding />
         </state>
       </provider>

@@ -17,7 +17,7 @@ def f(x,y): recv x@8;
 		    call f(x,y)@10;
 	    else
 		    call f(x,y)@11;
-	    endif@12;
+	    endif;
 	      
 def g(x): send x@13;
      	  call g(x)@14;

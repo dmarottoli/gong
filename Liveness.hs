@@ -33,10 +33,10 @@ barbs (New _ i bnd) = let (c,ty) = unsafeUnbind bnd
                       in barbs ty
 barbs (Par _ xs) = L.foldr (++) [] $ L.map barbs xs
 barbs (Buffer c (open,b,k))
-  | (k < b) && (k > 0) = [Send "" c Null, Recv "" c Null]
-  | k > 0 = [Send "" c Null]
-  | k < b = [Recv "" c Null]
-  | not open = [Send "" c Null]
+  | (k < b) && (k > 0) = [Send "" c Null, Recv "BUFFER" c Null]
+  | k > 0 = [Send "BUFFER" c Null]
+  | k < b = [Recv "BUFFER" c Null]
+  | not open = [Send "BUFFER" c Null]
   | otherwise = [] 
 barbs t = []
 
@@ -83,18 +83,19 @@ checkStates names k sys prev (x:next) =
   if isBuffer x
   then checkStates names k sys (prev++[x]) next
   else
-    do  let temp = succsNode k names (EqnSys $ bind sys (Par "l" (prev++next))) :: M [Eqn]
-        nexts <- temp
-        gotypes <- eqnToTypes temp
-        rest <- (checkStates names k sys (prev++[x]) next)
-        return $
-          (
-           -- if
-            (findMatch x gotypes)
-            -- then True
-            -- else error $ show (pprintType x ,L.map pprintType gotypes)
-          )
-          && rest
+    do  let temp = succsNode k names (EqnSys $ bind sys (Par "" (prev++next))) :: M [Eqn] in
+            do
+                nexts <- temp
+                gotypes <- eqnToTypes temp
+                rest <- (checkStates names k sys (prev++[x]) next)
+                return $
+                  (
+                   -- if
+                    (findMatch x gotypes)
+                    -- then True
+                    -- else error $ show (pprintType x ,L.map pprintType gotypes)
+                  )
+                  && rest
 
 
 liveness :: Bool -> Int -> M [Eqn] -> M Bool
@@ -110,19 +111,19 @@ liveness debug k eqs =
             if out
               then liveness debug k $ return xs
               else if debug
-                   then error $ "Term not live: " ++(show $ show ty) ++ "\n" ++ "Problem: " ++ (show $ show main) ++ "\n" ++ (analyze ty)
+                   then error $ "Term not live: " ++ "\n" ++ (analyze ty)
                    else return False
        [] -> return True
 
 analyze :: [GoType] -> String
-analyze gt = intercalate "; " (map notSynch gt)
+analyze gt = intercalate ";\n" (map notSynch gt)
 --analyze [] = ""
 --analyze (x:xs) = notSynch x ++ analyze xs
 
 notSynch :: GoType -> String
 notSynch gt = case gt of
-                (Send l c _) -> "There is a Send operation without synch on line " ++ (show l)
-                (Recv l c _) -> "There is a Recv operation without synch on line " ++ (show l)
+                (Send l c _) -> "There is a Send operation without synch on line " ++ l
+                (Recv l c _) -> "There is a Recv operation without synch on line " ++ l
                 otherwise -> ""
 
 -- ATTEMPT AT PARALLELISATION OF LIVENESS

@@ -72,45 +72,57 @@ eqGT t1 t2 = t1 `aeq` t2
 
 addToLine :: GoType -> String -> GoType
 addToLine t "" = t
-addToLine (Send line n t) newLine = Send (line++":"++ (removeFirstColon newLine)) n t
-addToLine (Recv line n t) newLine = Recv (line++":"++(removeFirstColon newLine)) n t
-addToLine (Tau line t) newLine = Tau (line++":"++(removeFirstColon newLine)) t
-addToLine (IChoice line t1 t2) newLine = IChoice (line++":"++(removeFirstColon newLine)) t1 t2
-addToLine (OChoice line gts) newLine = OChoice (line++":"++(removeFirstColon newLine)) gts
-addToLine (Par line gts) newLine = Par (line++":"++(removeFirstColon newLine)) gts
+addToLine (Send line n t) newLine = Send (line++"\n"++ (removeFirstNewLine newLine)) n t
+addToLine (Recv line n t) newLine = Recv (line++"\n"++(removeFirstNewLine newLine)) n t
+addToLine (Tau line t) newLine = Tau (line++"\n"++(removeFirstNewLine newLine)) t
+addToLine (IChoice line t1 t2) newLine = IChoice (line++"\n"++(removeFirstNewLine newLine)) t1 t2
+addToLine (OChoice line gts) newLine = OChoice (line++"\n"++(removeFirstNewLine newLine)) gts
+addToLine (Par line gts) newLine = Par (line++"\n"++(removeFirstNewLine newLine)) gts
 --addToLine (New line i b) newLine = New (line++":"++newLine) i b
-addToLine (New line i b) newLine = let (def1, main1) = runFreshM (unbind b) in New (line++":"++(removeFirstColon newLine)) i (bind def1 (addToLine main1 newLine))
-addToLine (Close line n t) newLine = Close (line++":"++(removeFirstColon newLine)) n t
-addToLine (TVar line eqn) newLine = TVar (line++":"++(removeFirstColon newLine)) eqn
+addToLine (New line i b) newLine = let (def1, main1) = runFreshM (unbind b) in New (line++"\n"++(removeFirstNewLine newLine)) i (bind def1 (addToLine main1 newLine))
+addToLine (Close line n t) newLine = Close (line++"\n"++(removeFirstNewLine newLine)) n t
+addToLine (TVar line eqn) newLine = TVar (line++"\n"++(removeFirstNewLine newLine)) eqn
 addToLine (ChanInst t names) newLine = ChanInst (addToLine t newLine) names
 addToLine (ChanAbst b) newLine = let (def1, main1) = runFreshM (unbind b) in ChanAbst (bind def1 (addToLine main1 newLine))
-addToLine (Seq line gts) newLine = Seq (line++":"++(removeFirstColon newLine)) gts
+addToLine (Seq line gts) newLine = Seq (line++"\n"++(removeFirstNewLine newLine)) gts
 addToLine t newLine = t
 
 getLineFromGT :: GoType -> String
-getLineFromGT (Send line _ _) = (getTopOfLineNumberStack line) ++ "S" ++ getRestOfLineNumberStack line
-getLineFromGT (Recv line _ _) = (getTopOfLineNumberStack line) ++ "R" ++ getRestOfLineNumberStack line
-getLineFromGT (Tau line _) = (getTopOfLineNumberStack line) ++ "T" ++ getRestOfLineNumberStack line
-getLineFromGT (IChoice line _ _) = (getTopOfLineNumberStack line) ++ "IF" ++ getRestOfLineNumberStack line
-getLineFromGT (OChoice line _) = (getTopOfLineNumberStack line) ++ "SEL" ++ getRestOfLineNumberStack line
-getLineFromGT (Par line _) = (getTopOfLineNumberStack line) ++"SPWN" ++ getRestOfLineNumberStack line
+getLineFromGT (Send line _ _) = "SEND on line " ++ line
+getLineFromGT (Recv line _ _) = "RECV on line " ++ line
+getLineFromGT (Tau line _) = "TIMED event on line " ++ line
+getLineFromGT (IChoice line _ _) = line
+getLineFromGT (OChoice line _) = line
+--getLineFromGT (Par line _) = (getTopOfLineNumberStack line) ++"SPWN" ++ getRestOfLineNumberStack line
 getLineFromGT (Close line _ _) = (getTopOfLineNumberStack line) ++ "CL" ++ getRestOfLineNumberStack line
-getLineFromGT (TVar line _) = (getTopOfLineNumberStack line) ++ "CALL" ++ getRestOfLineNumberStack line
-getLineFromGT (Seq line _) = (getTopOfLineNumberStack line) ++ "SEQ" ++ getRestOfLineNumberStack line
+--getLineFromGT (TVar line _) = (getTopOfLineNumberStack line) ++ "CALL" ++ getRestOfLineNumberStack line
+--getLineFromGT (Seq line _) = (getTopOfLineNumberStack line) ++ "SEQ" ++ getRestOfLineNumberStack line
 getLineFromGT t = ""
+
+getLineFromSynched :: GoType -> GoType -> String
+getLineFromSynched (Send line _ _) t = "SEND on line " ++ (getTopOfLineNumberStack line) ++ "\n\t" ++ replaceNewLines (getLineFromGT t) ++ (getRestOfLineNumberStack line)
+getLineFromSynched (Recv line _ _) t = "RECV on line " ++ (getTopOfLineNumberStack line) ++ "\n\t" ++ replaceNewLines (getLineFromGT t) ++ (getRestOfLineNumberStack line)
+getLineFromSynched (Tau line _) t = "TIMED event on line " ++ line
+--getLineFromSynched (Tau line _) _ = "TIMED event on line " ++ (getTopOfLineNumberStack line) ++ "\n\t" ++ replaceNewLines (getLineFromGT t) ++ (getRestOfLineNumberStack line)
+getLineFromSynched t1 t2 = getLineFromGT t1
+
+replaceNewLines :: String -> String
+replaceNewLines s = foldr (\x rec -> if x == '\n' then "\n\t" ++ rec else [x] ++ rec) "" s
+--replaceNewLines "" = ""
+--replaceNewLines (s:ss) = if s == '\n' then "\n\t" ++ ss else [s] ++ replaceNewLines ss
 
 getTopOfLineNumberStack :: String -> String
 getTopOfLineNumberStack "" = ""
-getTopOfLineNumberStack (s:ss) = if s == ':' then "" else [s] ++ (getTopOfLineNumberStack ss)
+getTopOfLineNumberStack (s:ss) = if s == '\n' then "" else [s] ++ (getTopOfLineNumberStack ss)
 
 getRestOfLineNumberStack :: String -> String
 getRestOfLineNumberStack "" = ""
-getRestOfLineNumberStack ":" = ""
-getRestOfLineNumberStack (s:ss) = if s == ':' then ":" ++ ss else getRestOfLineNumberStack ss
+getRestOfLineNumberStack "\n" = ""
+getRestOfLineNumberStack (s:ss) = if s == '\n' then "\n" ++ (removeFirstNewLine ss) else getRestOfLineNumberStack ss
 
-removeFirstColon :: String -> String
-removeFirstColon "" = ""
-removeFirstColon (s:ss) = if s == ':' then ss else (s:ss)
+removeFirstNewLine :: String -> String
+removeFirstNewLine "" = ""
+removeFirstNewLine (s:ss) = if s == '\n' then ss else (s:ss)
 --
 --initTuned :: String -> String
 --initTuned "" = ""
@@ -307,7 +319,7 @@ closeBNames m  = do
   return $ L.foldr (\mc end ->
                     case mc of
                       Just(i,c) -> New (snd (head ts)) i (bind c end)
-                      Nothing -> end) (Par "b" (getFirsts ts)) names' --Check THIS
+                      Nothing -> end) (Par "" (getFirsts ts)) names' --Check THIS
 
 getFirsts :: [(GoType, String)] -> [GoType]
 getFirsts [] = []
@@ -513,7 +525,12 @@ checkFinite debug defEnv pRecs ys zs cDef (Par _ [t]) = checkFinite debug defEnv
 checkFinite debug defEnv pRecs ys zs cDef (Par _ l) = do
                              foldM (\acc t -> do
                                                b <- checkFinite debug defEnv pRecs [] (zs++ys) cDef t
-                                               return $ b && acc) True l  
+                                               return $ b && acc) True l
+--                             recCase <- foldM (\acc t -> do
+--                                               b <- checkFinite debug defEnv pRecs ys zs cDef t
+--                                               return $ b && acc) True (tail l)
+--                             parCase <- checkFinite debug defEnv pRecs [] (zs++ys) cDef (head l)
+--                             return $ (recCase && parCase)
 checkFinite debug defEnv pRecs ys zs cDef (New _ i bnd) = do
                               (c,t) <- unbind bnd
                               checkFinite debug defEnv pRecs ys zs cDef t

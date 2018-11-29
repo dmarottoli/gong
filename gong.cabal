@@ -12,7 +12,7 @@ cabal-version:       >=1.10
 category:            Testing
 source-repository    head
   type:              git
-  location:          git://github.com/nickng/gong.git
+  location:          git://github.com/damifur/gong.git
 
 
 executable Gong

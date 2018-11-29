@@ -54,7 +54,7 @@ main :: IO ()
 main = do
   pargs <- cmdArgs (modes [subargs])
   tyfile <- (readFile $ gofile pargs)
-  putStrLn $ "tyfileeee: " ++ tyfile
+--  putStrLn $ "tyfileeee: " ++ tyfile
   case fullPass tyfile of
     Left err -> print err
     Right ty -> do if runCheck ((check pargs) ==  Debug) ty
@@ -67,9 +67,9 @@ main = do
                      let listsys = succs bound ty
                      let !tylist = runFreshM listsys
                      putStrLn $ "TyList Completa: " ++ show tylist
-                     putStrLn $ "Len de la tylist: " ++ show (length tylist)
-                     putStrLn $ "Bound (k): "++(show bound)
-                     putStrLn $ "Number of k-states: "++(show $ length tylist)
+--                     putStrLn $ "Len de la tylist: " ++ show (length tylist)
+--                     putStrLn $ "Bound (k): "++(show bound)
+--                     putStrLn $ "Number of k-states: "++(show $ length tylist)
                      when ((check pargs) ==  Debug || (check pargs)==List) $ do
                        let debugty = runFreshM $ getTypes tylist
                        putStrLn $ "\n[Debug]k-reachable states:\n"++(pprintTypeList debugty)

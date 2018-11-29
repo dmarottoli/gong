@@ -1,0 +1,16 @@
+def main.main():
+    let t0 = newchan main.main.t0_0_0, 0 @14;
+    call main.main#3(t0) @0;
+def main.main#3(t0):
+    let t1 = newchan main.main.t1_0_0, 0 @16;
+    if spawn main.S(t1, t0) @18; else endif;
+def main.main#5_loop0(t0, t1):
+    call main.main#3(t0, t1, t0, t1) @0;
+    let t1 = newchan main.main.t1_0_1, 0 @16;
+    if spawn main.S(t1, t0) @18; call main.main#3(t0, t1, t0, t1, t1) @0; let t1 = newchan main.main.t1_0_2, 0 @16; if spawn main.S(t1, t0) @18; call main.main#3(t0, t1, t0, t1, t1, t1) @0; let t1 = newchan main.main.t1_0_3, 0 @16; if spawn main.S(t1, t0) @18; call main.main#3(t0, t1, t0, t1, t1, t1, t1) @0; let t1 = newchan main.main.t1_0_4, 0 @16; if spawn main.S(t1, t0) @18; call main.main#3(t0, t1, t0, t1, t1, t1, t1, t1) @0; let t1 = newchan main.main.t1_0_5, 0 @16; if spawn main.S(t1, t0) @18; call main.main#3(t0, t1, t0, t1, t1, t1, t1, t1, t1) @0; let t1 = newchan main.main.t1_0_6, 0 @16; if spawn main.S(t1, t0) @18; call main.main#3(t0, t1, t0, t1, t1, t1, t1, t1, t1, t1) @0; let t1 = newchan main.main.t1_0_7, 0 @16; if spawn main.S(t1, t0) @18; call main.main#3(t0, t1, t0, t1, t1, t1, t1, t1, t1, t1, t1) @0; let t1 = newchan main.main.t1_0_8, 0 @16; if spawn main.S(t1, t0) @18; call main.main#3(t0, t1, t0, t1, t1, t1, t1, t1, t1, t1, t1, t1) @0; let t1 = newchan main.main.t1_0_9, 0 @16; if spawn main.S(t1, t0) @18; call main.main#3(t0, t1, t0, t1, t1, t1, t1, t1, t1, t1, t1, t1, t1) @0; recv t0 @23; else spawn main.R(t1, t0) @20; endif; else endif; else endif; else endif; else endif; else endif; else endif; else endif; else endif;
+def main.S(ch, done):
+    send ch @4;
+    send done @5;
+def main.R(ch, done):
+    recv ch @9;
+    send done @10;

@@ -39,8 +39,8 @@ data Interm = Seq [Interm]
               | Cl Int String
               | Spawn Int String [String]
               | NewChan Int String String Integer
-              | If Int Interm Interm
-              | Select Int [Interm]
+              | If Interm Interm
+              | Select [Interm]
               | T Int
               | S Int String
               | R Int String
@@ -141,12 +141,9 @@ itparser =
             return $ Spawn l x list }
   <|>
   do { reserved "select"
-     ; symbol "@"
-     ; line <- many $ P.digit
      ; l <- many (reserved "case" *> seqInterm)
      ; reserved "endselect"
-     ; let li = read line :: Int in
-            return $ Select li l }
+     ; return $ Select l }
   <|>
   do { reserved "let"
      ; x <- identifier
@@ -165,10 +162,7 @@ itparser =
      ; reserved "else"
      ; e <- seqInterm
      ; reserved "endif"
-     ; symbol "@"
-     ; line <- many $ P.digit
-     ; let l = read line :: Int in
-            return $ If l t e }
+     ; return $ If t e }
   <|>
   do { reserved "tau"
      ; symbol "@"
@@ -220,14 +214,14 @@ parseTest s =
 
 contzElim :: Interm -> Interm
 contzElim (Seq l) = Seq (contzElim' l)
-contzElim (If l p1 p2) = If l (contzElim p1) (contzElim p2)
-contzElim (Select line l) = Select line (L.map contzElim l)
+contzElim (If p1 p2) = If (contzElim p1) (contzElim p2)
+contzElim (Select l) = Select (L.map contzElim l)
 contzElim p = p
 
 contzElim' (x:y:xs) = case (x,y) of
                         (Call _ _ _ , Zero) -> [x] -- No need to keep going
-                        (If l p1 p2, Zero) -> [If l (contzElim p1) (contzElim p2)]
-                        (Select line l , Zero) -> [Select line (L.map contzElim l)]
+                        (If p1 p2, Zero) -> [If (contzElim p1) (contzElim p2)]
+                        (Select l , Zero) -> [Select (L.map contzElim l)]
                         (_,_) -> (contzElim x):(contzElim' (y:xs))
 contzElim' ([x]) = [contzElim x]
 contzElim' [] = []
@@ -257,19 +251,19 @@ transformSeq :: [String] -> [Interm] -> GT.GoType
 transformSeq vars (x:xs) =
   case x of
     (Call line s l) -> throwError l vars $
-                  GT.Seq (show line) [(GT.ChanInst (GT.TVar (show line) (s2n s)) (L.map s2n l)), (transformSeq vars xs) ]
+                  GT.Seq (addLine line "") [(GT.ChanInst (GT.TVar (addLine line "CALL on Line ") (s2n s)) (L.map s2n l)), (transformSeq vars xs) ]
     
     (Cl line s) -> throwError [s] vars $
               GT.Close (show line) (s2n s) (transformSeq vars xs)
     
     (Spawn line s l) -> throwError l vars $
-                   GT.Par (show line) [(GT.ChanInst (GT.TVar (show line) (s2n s)) (L.map s2n l)) , (transformSeq vars xs)]
+                   GT.Par (addLine line "") [(GT.ChanInst (GT.TVar (addLine line "SPAWN on Line ") (s2n s)) (L.map s2n l)) , (transformSeq vars xs)]
 
     (NewChan line s1 s2 n) -> GT.New (show line) (fromIntegral n) (bind (s2n s1) (transformSeq (s1:vars) xs))
     
-    (If line p1 p2) -> GT.IChoice (show line) (transform vars p1) (transform vars p2)
+    (If p1 p2) -> GT.IChoice "" (transform vars p1) (transform vars p2)
     
-    (Select line l) -> GT.OChoice (show line) (L.map (transform vars) l)
+    (Select l) -> GT.OChoice "" (L.map (transform vars) l)
     
     (T line) -> GT.Tau (show line) (transformSeq vars xs)
     
@@ -280,6 +274,10 @@ transformSeq vars (x:xs) =
              GT.Recv (show line) (s2n s) (transformSeq vars xs)
     (Zero) -> GT.Null  
 transformSeq vars [] = GT.Null
+
+addLine :: Int -> String -> String
+addLine 0 _ = ""
+addLine i extra = extra ++ show i
 
 transformDef (D s l p) = (s2n s , Embed(GT.ChanAbst (bind (L.map s2n l) (transform l p))))
 transformMain (D _ vars p) = transform vars p

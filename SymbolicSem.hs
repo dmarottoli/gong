@@ -16,17 +16,8 @@ import System.IO.Unsafe
 import Debug.Trace
 
 
-
-
-
-
 inList :: GoType -> [GoType] -> Bool
-inList t [] = False
-inList t (x:xs) = (t `eqGT` x) ||  (inList t xs)
-
-
-
-
+inList t = foldr (\gt rec -> (t `eqGT` gt) || rec) False
 
 symCondition :: [ChName] -> [ChName] -> Bool
 symCondition m [] = False
@@ -60,14 +51,16 @@ unfoldTillGuard k m  seen defEnv trace ori@(ChanInst (TVar line t) lc)
                   let perm = L.foldr
                              (\(d,c) acc -> compose acc (single (AnyName d) (AnyName c)))
                              (Unbound.LocallyNameless.empty) (zip ld lc)
-                  unfoldTillGuard k m (t:seen) defEnv (line ++ ":" ++ (removeFirstColon trace)) $ swaps perm t0
+                  unfoldTillGuard k m (t:seen) defEnv (line ++ "\n" ++ (removeFirstNewLine trace)) $ swaps perm t0
              _ -> return ty
       _ -> error $ "[unfoldTillGuard]Definition "++(show t)++" not found."++(show defEnv)
 unfoldTillGuard k m  seen defEnv trace (New line i bnd) =
   do (c,ty) <- unbind bnd
      nty <- let nm = if (length m) < k then c:m
                      else m
-            in unfoldTillGuard k nm seen defEnv ((getRestOfLineNumberStack line) ++ ":" ++ (removeFirstColon trace)) ty
+                toAdd = getRestOfLineNumberStack line
+            in if L.null toAdd then unfoldTillGuard k nm seen defEnv trace ty
+               else unfoldTillGuard k nm seen defEnv (toAdd ++ "\n" ++ (removeFirstNewLine trace)) ty
      return $ New line i (bind c nty)
 unfoldTillGuard  k m seen defEnv trace (ChanAbst bnd) =
   do (c,ty) <- unbind bnd
@@ -77,7 +70,7 @@ unfoldTillGuard  k m seen defEnv trace (Seq line xs) = case xs of
   [x] -> unfoldTillGuard k m seen defEnv trace x
   [x,Null] -> unfoldTillGuard k m seen defEnv trace x
   otherwise -> error $ "[unfoldTillGuard] We don't deal with Seq yet: \n"++(pprintType $ Seq line xs)
-unfoldTillGuard  k m seen defEnv trace t = return (addToLine t trace)
+unfoldTillGuard  k m seen defEnv trace t = return (addToLine t (removeFirstNewLine trace))
 
 
 isTau :: GoType -> Bool
@@ -92,25 +85,25 @@ getFreePars t = return $ [t]
 
 
 getGuardsCont :: GoType -> [(GoType, GoType)]
-getGuardsCont (Send l n t) = [(Send l n Null, t)] -- IMPORTANTE: Aca es cuando le tengo que pasar la línea del send a las cosas que vienen después secuencialmente
+getGuardsCont (Send l n t) = [(Send l n Null, t)]
 getGuardsCont (Recv l n t) = [(Recv l n Null, t)]
 getGuardsCont (Tau l t) = [(Tau l Null, t)]
-getGuardsCont (IChoice line t1 t2) = [(Tau line Null, addToLine t1 ((getTopOfLineNumberStack line) ++ "IF" ++ (getRestOfLineNumberStack line) )), (Tau line Null, addToLine t2 (line++"IF"++":"))]
-getGuardsCont (OChoice line xs) = L.foldr (++) [] $ map getGuardsCont (map (\x -> addToLine x ((getTopOfLineNumberStack line) ++ "IF" ++ (getRestOfLineNumberStack line))) xs)
+getGuardsCont (IChoice line t1 t2) = [(Tau line Null, addToLine t1 line ), (Tau line Null, addToLine t2 line )]
+getGuardsCont (OChoice line xs) = L.foldr (++) [] $ map getGuardsCont (map (\x -> addToLine x line) xs)
 getGuardsCont (Close l c ty) = [(Close l c Null, ty)]
 getGuardsCont (Buffer c (open,b,k))
     | (b==0 && k==0)= [(ClosedBuffer c, Buffer c (False,b,k))]
-    | (k < b) && (k > 0) = [ (Send "" c Null, Buffer c (open,b,k-1))
-                           , (Recv "" c Null, Buffer c (open,b,k+1))
+    | (k < b) && (k > 0) = [ (Send "BUFFER" c Null, Buffer c (open,b,k-1))
+                           , (Recv "BUFFER" c Null, Buffer c (open,b,k+1))
                            , (ClosedBuffer c, Buffer c (False,b,k))
                            ]
-    | k > 0 = [(Send "" c Null, Buffer c (open,b,k-1))
+    | k > 0 = [(Send "BUFFER" c Null, Buffer c (open,b,k-1))
               , (ClosedBuffer c, Buffer c (False,b,k))
               ]
-    | k < b = [(Recv "" c Null, Buffer c (open,b,k+1))
+    | k < b = [(Recv "BUFFER" c Null, Buffer c (open,b,k+1))
               , (ClosedBuffer c, Buffer c (False,b,k))
               ]
-    | not open = [(Send "" c Null, Buffer c (open,b,k-1))
+    | not open = [(Send "BUFFER" c Null, Buffer c (open,b,k-1))
                  , (ClosedBuffer c, Buffer c (False,b,k))
                  ]
     | otherwise = [] 
@@ -124,7 +117,7 @@ compatibleConts :: [(GoType, GoType)] -> [(GoType, GoType)] -> [(GoType, GoType)
 compatibleConts xs ys =
   let prod = cartProd xs ys
       compa ((g1,t1), (g2,t2)) = match g1 g2
-  in L.map (\((g1,t1),(g2,t2)) -> (addToLine t1 (getLineFromGT g1),addToLine t2 (getLineFromGT g2))) $
+  in L.map (\((g1,t1),(g2,t2)) -> (addToLine t1 (getLineFromSynched g1 g2),addToLine t2 (getLineFromSynched g2 g1))) $
      L.filter compa prod
 
 match :: GoType -> GoType -> Bool
@@ -165,7 +158,7 @@ genParSuccs prev (x:xs) =
       bguards = blockingGuards guards
       tauguards = tauGuards guards
       tausuccs =
-        L.map (\x -> prev++[x]++xs) (L.map (\(g,t) -> t) tauguards)
+        L.map (\x -> prev++[x]++xs) (L.map (\(g,t) -> addToLine t (getLineFromSynched g t)) tauguards)
   in (succsOf bguards prev xs)
      ++
      tausuccs
@@ -181,7 +174,7 @@ genSuccs defEnv (New line i bnd) = do (c,ty) <- unbind bnd
                                       ret <- (genSuccs defEnv ty)
                                       return $ L.map (\t -> New line i $ bind c t) ret
 genSuccs defEnv (Par line xs) = return $ L.map (\x -> Par line x) $ genParSuccs [] xs
-genSuccs defEnvt t = return $ L.map (\x -> Par "a" x) $ genParSuccs [] [t] -- Here instead of instanciating the Paralel composition with empty line number it would be nice to have the line number of t. TODO: Create a function to get line number from gotype
+genSuccs defEnvt t = return $ L.map (\x -> Par "" x) $ genParSuccs [] [t]
 
 
 genStates :: Int -> [ChName] -> Environment -> [GoType] -> [GoType] -> M [GoType]

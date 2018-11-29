@@ -1,0 +1,25 @@
+def main.main():
+    let t0 = newchan main.main.t0_0_0, 0 @29;
+    let t1 = newchan main.main.t1_0_0, 0 @30;
+    spawn main.work(t0) @31;
+    spawn main.work(t1) @32;
+    call main.fanin(t0, t1) @33;
+    call main.main#1(t0, t1) @0;
+def main.fanin(ch1, ch2):
+    let t3 = newchan main.fanin.t3_0_0, 0 @14;
+    spawn main.fanin$1(t0, t1, t3) @15;
+def main.main#1(t0, t1):
+    recv t3 @35;
+    call main.main#1(t0, t1, t0, t1) @0;
+def main.work(out):
+    call main.work#1(out) @0;
+def main.work#1(out):
+    send out @9;
+    call main.work#1(out) @0;
+def main.fanin$1(ch1, ch2, c):
+    call main.fanin$1#1(ch1, ch2, c) @0;
+def main.fanin$1#1(ch1, ch2, c):
+    select
+      case recv ch1 @18; send c @19; call main.fanin$1#1(ch1, ch2, c) @0;
+      case recv ch2 @20; send c @21; call main.fanin$1#1(ch1, ch2, c) @0;
+    endselect;
