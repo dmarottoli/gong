@@ -1,12 +1,8 @@
 def main.main():
     let t0 = newchan main.main.t0_0_0, 0@8;
-    spawn main.main$2(t0)@20;
-    call main.main$3(t0)@22;
-    close t0@25;
-def main.main$1(ch):
-    send ch@50;
-    call main.main$1(ch)@51;
+    spawn main.c(t0)@20;
+    recv t0@25;
 def main.main$2(ch):
-    send ch@60;
-def main.main$3(ch):
-    recv ch@61;
+    recv ch@60;
+def main.c(ch):
+    call main.main$2(ch)@90;

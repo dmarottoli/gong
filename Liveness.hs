@@ -77,8 +77,8 @@ eqnToTypes mlist = do list <- mlist
 -- Given a parallel composition of type, check whether each
 -- one can make a move
 --
-checkStates :: [ChName] -> Int -> Rec [(EqnName, Embed GoType)] -> [GoType] -> [GoType] -> M Bool
-checkStates names k sys prev [] = return True
+checkStates :: [ChName] -> Int -> Rec [(EqnName, Embed GoType)] -> [GoType] -> [GoType] -> M [GoType]
+checkStates names k sys prev [] = return []
 checkStates names k sys prev (x:next) =
   if isBuffer x
   then checkStates names k sys (prev++[x]) next
@@ -88,14 +88,14 @@ checkStates names k sys prev (x:next) =
                 nexts <- temp
                 gotypes <- eqnToTypes temp
                 rest <- (checkStates names k sys (prev++[x]) next)
-                return $
-                  (
-                   -- if
-                    (findMatch x gotypes)
-                    -- then True
-                    -- else error $ show (pprintType x ,L.map pprintType gotypes)
-                  )
-                  && rest
+                return $ if (not (findMatch x gotypes)) then (x:rest) else rest
+--                  (
+--                   -- if
+--                    (findMatch x gotypes)
+--                    -- then True
+--                    -- else error $ show (pprintType x ,L.map pprintType gotypes)
+--                  )
+--                  && rest
 
 
 liveness :: Bool -> Int -> M [Eqn] -> M Bool
@@ -108,10 +108,10 @@ liveness debug k eqs =
                   extractType (return main)
             let names = L.nub $ fv ty :: [ChName]
             out <- checkStates names k defs [] ty
-            if out
+            if L.null out
               then liveness debug k $ return xs
               else if debug
-                   then error $ "Term not live: " ++ "\n" ++ (analyze ty)
+                   then error $ "Term not live: " ++ "\n" ++ (analyze out)
                    else return False
        [] -> return True
 
@@ -129,7 +129,7 @@ notSynch gt = case gt of
 -- ATTEMPT AT PARALLELISATION OF LIVENESS
 --
 atomLiveness :: Int -> Eqn -> Bool
-atomLiveness k eq = runFreshM $ helper k eq
+atomLiveness k eq = L.null (runFreshM $ helper k eq)
   where helper k eq =
           case eq of
             sys@(EqnSys bnd) ->

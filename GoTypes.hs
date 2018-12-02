@@ -66,7 +66,7 @@ eqGT (New _ _ t1) (New _ _ t2) = let (def1, main1) = runFreshM (unbind t1) in le
 eqGT (Close _ name t) (Close _ name2 t2) = (name `aeq` name2) && (eqGT t t2)
 eqGT (TVar _ name1) (TVar _ name2) = name1 `aeq` name2
 eqGT (ChanInst t1 names1) (ChanInst t2 names2) = (eqGT t1 t2) && (names1 `aeq` names2)
-eqGT (ChanAbst t1) (ChanAbst t2) = let (def1, main1) = runFreshM (unbind t1) in let (def2, main2) = runFreshM (unbind t2) in main1 `eqGT` main2
+eqGT (ChanAbst t1) (ChanAbst t2) = let (def1, main1) = runFreshM (unbind t1) in let (def2, main2) = runFreshM (unbind t2) in main1 `eqGT` main2 && def1 `aeq` def2
 eqGT (Seq _ xs) (Seq _ ys) = L.foldr (\p ac -> ac && (eqGT (fst p) (snd p))) True (L.zip xs ys)
 eqGT t1 t2 = t1 `aeq` t2
 
@@ -94,7 +94,7 @@ getLineFromGT (Tau line _) = "TIMED event on line " ++ line
 getLineFromGT (IChoice line _ _) = line
 getLineFromGT (OChoice line _) = line
 --getLineFromGT (Par line _) = (getTopOfLineNumberStack line) ++"SPWN" ++ getRestOfLineNumberStack line
-getLineFromGT (Close line _ _) = (getTopOfLineNumberStack line) ++ "CL" ++ getRestOfLineNumberStack line
+getLineFromGT (Close line _ _) = "Close operation on line " ++ line
 --getLineFromGT (TVar line _) = (getTopOfLineNumberStack line) ++ "CALL" ++ getRestOfLineNumberStack line
 --getLineFromGT (Seq line _) = (getTopOfLineNumberStack line) ++ "SEQ" ++ getRestOfLineNumberStack line
 getLineFromGT t = ""

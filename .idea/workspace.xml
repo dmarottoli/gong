@@ -3,16 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="0ffb473f-feba-47ff-a3b3-46678e629185" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/GoParser.hs" afterPath="$PROJECT_DIR$/GoParser.hs" />
       <change beforePath="$PROJECT_DIR$/GoTypes.hs" afterPath="$PROJECT_DIR$/GoTypes.hs" />
-      <change beforePath="$PROJECT_DIR$/Gong.hs" afterPath="$PROJECT_DIR$/Gong.hs" />
       <change beforePath="$PROJECT_DIR$/Liveness.hs" afterPath="$PROJECT_DIR$/Liveness.hs" />
-      <change beforePath="$PROJECT_DIR$/SymbolicSem.hs" afterPath="$PROJECT_DIR$/SymbolicSem.hs" />
-      <change beforePath="$PROJECT_DIR$/examples/.fibonacci.cfgo.swp" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/examples/nofence.cgo" afterPath="$PROJECT_DIR$/examples/nofence.cgo" />
-      <change beforePath="$PROJECT_DIR$/examples/primesieve.cgo" afterPath="$PROJECT_DIR$/examples/primesieve.cgo" />
+      <change beforePath="$PROJECT_DIR$/Safety.hs" afterPath="$PROJECT_DIR$/Safety.hs" />
       <change beforePath="$PROJECT_DIR$/examples/simple.cgo" afterPath="$PROJECT_DIR$/examples/simple.cgo" />
-      <change beforePath="$PROJECT_DIR$/gong.cabal" afterPath="$PROJECT_DIR$/gong.cabal" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -26,7 +20,7 @@
       <file leaf-file-name="Gong.hs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Gong.hs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="690">
+            <state relative-caret-position="1365">
               <caret line="91" column="39" lean-forward="false" selection-start-line="91" selection-start-column="39" selection-end-line="91" selection-end-column="39" />
               <folding />
             </state>
@@ -36,8 +30,18 @@
       <file leaf-file-name="Liveness.hs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Liveness.hs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="598">
-              <caret line="118" column="44" lean-forward="false" selection-start-line="118" selection-start-column="36" selection-end-line="118" selection-end-column="44" />
+            <state relative-caret-position="100">
+              <caret line="81" column="39" lean-forward="false" selection-start-line="81" selection-start-column="39" selection-end-line="81" selection-end-column="39" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Safety.hs" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Safety.hs">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-22">
+              <caret line="93" column="191" lean-forward="false" selection-start-line="93" selection-start-column="191" selection-end-line="93" selection-end-column="191" />
               <folding />
             </state>
           </provider>
@@ -46,7 +50,7 @@
       <file leaf-file-name="TypeSize.hs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/TypeSize.hs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-109">
+            <state relative-caret-position="510">
               <caret line="34" column="29" lean-forward="false" selection-start-line="34" selection-start-column="29" selection-end-line="34" selection-end-column="29" />
               <folding />
             </state>
@@ -56,18 +60,8 @@
       <file leaf-file-name="StuffParams.hs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/StuffParams.hs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-2752">
+            <state relative-caret-position="5430">
               <caret line="362" column="5" lean-forward="false" selection-start-line="362" selection-start-column="5" selection-end-line="362" selection-end-column="5" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Safety.hs" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Safety.hs">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-570">
-              <caret line="32" column="22" lean-forward="false" selection-start-line="32" selection-start-column="22" selection-end-line="32" selection-end-column="22" />
               <folding />
             </state>
           </provider>
@@ -86,18 +80,18 @@
       <file leaf-file-name="SymbolicSem.hs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/SymbolicSem.hs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-2138">
-              <caret line="19" column="33" lean-forward="false" selection-start-line="19" selection-start-column="33" selection-end-line="19" selection-end-column="37" />
+            <state relative-caret-position="383">
+              <caret line="119" column="42" lean-forward="false" selection-start-line="119" selection-start-column="42" selection-end-line="119" selection-end-column="42" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="GoTypes.hs" pinned="false" current-in-tab="true">
+      <file leaf-file-name="GoTypes.hs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/GoTypes.hs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-60">
-              <caret line="32" column="26" lean-forward="false" selection-start-line="32" selection-start-column="19" selection-end-line="32" selection-end-column="26" />
+            <state relative-caret-position="397">
+              <caret line="96" column="67" lean-forward="false" selection-start-line="96" selection-start-column="67" selection-end-line="96" selection-end-column="67" />
               <folding />
             </state>
           </provider>
@@ -106,7 +100,7 @@
       <file leaf-file-name="GoParser.hs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/GoParser.hs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="313">
+            <state relative-caret-position="3975">
               <caret line="265" column="22" lean-forward="false" selection-start-line="265" selection-start-column="22" selection-end-line="265" selection-end-column="22" />
               <folding />
             </state>
@@ -117,19 +111,7 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>findMatch</find>
-      <find>matchTypes</find>
-      <find>extractType ::</find>
-      <find>getGuardsCont</find>
-      <find>succsNode</find>
-      <find>normalize</find>
-      <find>matchTy</find>
-      <find>match ::</find>
-      <find>trace</find>
-      <find>maxnestednames</find>
-      <find>symsemBound</find>
       <find>sizeOfEqs</find>
-      <find>extractType</find>
       <find>sizeOfT</find>
       <find>succs ::</find>
       <find>gcBuffer ::</find>
@@ -137,16 +119,28 @@
       <find>gcBuffer</find>
       <find>normalise</find>
       <find>swaps</find>
-      <find>getLineFromSynched</find>
       <find>transform</find>
       <find>&quot;Close</find>
       <find>check ::</find>
       <find>notSynch</find>
       <find>blockingG</find>
       <find>eqGT</find>
-      <find>unfoldT</find>
       <find>ChName</find>
+      <find>unfoldT</find>
+      <find>checkStates</find>
+      <find>findMatch</find>
+      <find>extractType</find>
+      <find>succsNode</find>
+      <find>nexts</find>
       <find>inList</find>
+      <find>match ::</find>
+      <find>extract</find>
+      <find>match</find>
+      <find>atomLiveness</find>
+      <find>checkAllSuccs</find>
+      <find>getLineFromSynched</find>
+      <find>addTo</find>
+      <find>addToLine</find>
     </findStrings>
     <replaceStrings>
       <replace>removeFirstNewLine</replace>
@@ -162,13 +156,13 @@
       <list>
         <option value="$PROJECT_DIR$/StuffParams.hs" />
         <option value="$PROJECT_DIR$/PrettyGoTypes.hs" />
-        <option value="$PROJECT_DIR$/Safety.hs" />
         <option value="$PROJECT_DIR$/GoParser.hs" />
-        <option value="$PROJECT_DIR$/Liveness.hs" />
         <option value="$PROJECT_DIR$/TypeSize.hs" />
         <option value="$PROJECT_DIR$/Gong.hs" />
-        <option value="$PROJECT_DIR$/GoTypes.hs" />
         <option value="$PROJECT_DIR$/SymbolicSem.hs" />
+        <option value="$PROJECT_DIR$/Liveness.hs" />
+        <option value="$PROJECT_DIR$/GoTypes.hs" />
+        <option value="$PROJECT_DIR$/Safety.hs" />
       </list>
     </option>
   </component>
@@ -199,6 +193,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scratches" />
       <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
@@ -211,7 +206,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -614,7 +608,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/StuffParams.hs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-2752">
+        <state relative-caret-position="5430">
           <caret line="362" column="5" lean-forward="false" selection-start-line="362" selection-start-column="5" selection-end-line="362" selection-end-column="5" />
           <folding />
         </state>
@@ -622,7 +616,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/TypeSize.hs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-109">
+        <state relative-caret-position="510">
           <caret line="34" column="29" lean-forward="false" selection-start-line="34" selection-start-column="29" selection-end-line="34" selection-end-column="29" />
           <folding />
         </state>
@@ -630,31 +624,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/GoParser.hs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="313">
+        <state relative-caret-position="3975">
           <caret line="265" column="22" lean-forward="false" selection-start-line="265" selection-start-column="22" selection-end-line="265" selection-end-column="22" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Safety.hs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-570">
-          <caret line="32" column="22" lean-forward="false" selection-start-line="32" selection-start-column="22" selection-end-line="32" selection-end-column="22" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Liveness.hs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="598">
-          <caret line="118" column="44" lean-forward="false" selection-start-line="118" selection-start-column="36" selection-end-line="118" selection-end-column="44" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Gong.hs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="690">
+        <state relative-caret-position="1365">
           <caret line="91" column="39" lean-forward="false" selection-start-line="91" selection-start-column="39" selection-end-line="91" selection-end-column="39" />
           <folding />
         </state>
@@ -662,16 +640,32 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/SymbolicSem.hs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-2138">
-          <caret line="19" column="33" lean-forward="false" selection-start-line="19" selection-start-column="33" selection-end-line="19" selection-end-column="37" />
+        <state relative-caret-position="383">
+          <caret line="119" column="42" lean-forward="false" selection-start-line="119" selection-start-column="42" selection-end-line="119" selection-end-column="42" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/GoTypes.hs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-60">
-          <caret line="32" column="26" lean-forward="false" selection-start-line="32" selection-start-column="19" selection-end-line="32" selection-end-column="26" />
+        <state relative-caret-position="397">
+          <caret line="96" column="67" lean-forward="false" selection-start-line="96" selection-start-column="67" selection-end-line="96" selection-end-column="67" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Liveness.hs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="100">
+          <caret line="81" column="39" lean-forward="false" selection-start-line="81" selection-start-column="39" selection-end-line="81" selection-end-column="39" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Safety.hs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-22">
+          <caret line="93" column="191" lean-forward="false" selection-start-line="93" selection-start-column="191" selection-end-line="93" selection-end-column="191" />
           <folding />
         </state>
       </provider>
