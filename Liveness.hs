@@ -33,11 +33,12 @@ barbs (New _ i bnd) = let (c,ty) = unsafeUnbind bnd
                       in barbs ty
 barbs (Par _ xs) = L.foldr (++) [] $ L.map barbs xs
 barbs (Buffer c (open,b,k))
-  | (k < b) && (k > 0) = [Send "" c Null, Recv "BUFFER" c Null]
+  | (k < b) && (k > 0) = [Send "BUFFER" c Null, Recv "BUFFER" c Null]
   | k > 0 = [Send "BUFFER" c Null]
-  | k < b = [Recv "BUFFER" c Null]
+  | k < b && open = [Recv "BUFFER" c Null]
+  | k < b && not open = [Recv "BUFFER" c Null, Send "BUFFER" c Null]
   | not open = [Send "BUFFER" c Null]
-  | otherwise = [] 
+  | otherwise = []
 barbs t = []
 
 

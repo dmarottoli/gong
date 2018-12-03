@@ -92,18 +92,25 @@ getGuardsCont (IChoice line t1 t2) = [(Tau line Null, addToLine t1 line ), (Tau 
 getGuardsCont (OChoice line xs) = L.foldr (++) [] $ map getGuardsCont (map (\x -> addToLine x line) xs)
 getGuardsCont (Close l c ty) = [(Close l c Null, ty)]
 getGuardsCont (Buffer c (open,b,k))
-    | (b==0 && k==0)= [(ClosedBuffer c, Buffer c (False,b,k))]
-    | (k < b) && (k > 0) = [ (Send "BUFFER" c Null, Buffer c (open,b,k-1))
-                           , (Recv "BUFFER" c Null, Buffer c (open,b,k+1))
+    | (b==0 && k==0) && open = [(ClosedBuffer c, Buffer c (False,b,k))]
+    | (b==0 && k==0) && not open = [ (Send ("BUFFER: {Status: Closed}") c Null, Buffer c (open,b,k))
+                                   , (ClosedBuffer c, Buffer c (False,b,k))
+                                   ]
+    | (k < b) && (k > 0) = [ (Send ("BUFFER: {Capacity: " ++ show b ++ " - Size: " ++ show k ++ " -> " ++ show (k-1) ++ "}") c Null, Buffer c (open,b,k-1))
+                           , (Recv ("BUFFER: {Capacity: " ++ show b ++ " - Size: " ++ show k ++ " -> " ++ show (k+1) ++ "}") c Null, Buffer c (open,b,k+1))
                            , (ClosedBuffer c, Buffer c (False,b,k))
                            ]
-    | k > 0 = [(Send "BUFFER" c Null, Buffer c (open,b,k-1))
+    | k > 0 = [(Send ("BUFFER: {Capacity: " ++ show b ++ " - Size: " ++ show k ++ " -> " ++ show (k-1) ++ "}") c Null, Buffer c (open,b,k-1))
               , (ClosedBuffer c, Buffer c (False,b,k))
               ]
-    | k < b = [(Recv "BUFFER" c Null, Buffer c (open,b,k+1))
+    | k < b && open = [(Recv ("BUFFER: {Capacity: " ++ show b ++ " - Size: " ++ show k ++ " -> " ++ show (k+1) ++ "}") c Null, Buffer c (open,b,k+1))
               , (ClosedBuffer c, Buffer c (False,b,k))
               ]
-    | not open = [(Send "BUFFER" c Null, Buffer c (open,b,k-1))
+    | k < b && not open = [(Recv ("BUFFER: {Capacity: " ++ show b ++ " - Size: " ++ show k ++ " -> " ++ show (k+1) ++ "}") c Null, Buffer c (open,b,k+1))
+              , (Send ("BUFFER: {Capacity: " ++ show b ++ " - Size: " ++ show k ++ " -> " ++ show (k-1) ++ "}") c Null, Buffer c (open,b,k-1))
+              , (ClosedBuffer c, Buffer c (False,b,k))
+              ]
+    | not open = [(Send ("BUFFER: {Status: Closed}") c Null, Buffer c (open,b,k))
                  , (ClosedBuffer c, Buffer c (False,b,k))
                  ]
     | otherwise = [] 

@@ -27,13 +27,13 @@ closebarbs :: GoType -> [GoType]
 closebarbs (Close l c ty) = [Close l c Null]
 closebarbs t = []
 
-forbiddenAction :: GoType -> [GoType]
-forbiddenAction (Send l n t) = [Send l n Null]
-forbiddenAction (Close l c ty) = [Close l c Null]
-forbiddenAction (New _ i bnd) = let (c,ty) = unsafeUnbind bnd
-                              in forbiddenAction ty
-forbiddenAction (Par _ xs) = L.foldr (++) [] $ L.map forbiddenAction xs
-forbiddenAction t = []
+forbiddenAction :: GoType -> GoType -> [GoType]
+forbiddenAction (Send l n t) _ = [Send l n Null]
+forbiddenAction (Close l c ty) _ = [Close l c Null]
+forbiddenAction (New _ i bnd) t2 = let (c,ty) = unsafeUnbind bnd
+                              in forbiddenAction ty t2
+forbiddenAction (Par _ xs) c = L.foldr (++) [] $ L.map (flip forbiddenAction c) xs
+forbiddenAction t _ = []
 
 
 badmatch :: GoType -> GoType -> Bool
@@ -50,7 +50,7 @@ noclose list@(x:xs) ys =
 
 
 checkPair :: GoType -> GoType -> [(GoType, GoType)]
-checkPair t1 t2 = noclose (closebarbs t1) (forbiddenAction t2)
+checkPair t1 t2 = noclose (closebarbs t1) (forbiddenAction t2 t1)
 
 
 checkList :: GoType -> [GoType] -> [(GoType, GoType)]
