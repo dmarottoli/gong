@@ -99,7 +99,7 @@ checkStates names k sys prev (x:next) =
 --                  && rest
 
 
-liveness :: Bool -> Int -> M [Eqn] -> M Bool
+liveness :: Bool -> Int -> M [Eqn] -> M String
 liveness debug k eqs =
   do list <- eqs
      case list of
@@ -112,9 +112,9 @@ liveness debug k eqs =
             if L.null out
               then liveness debug k $ return xs
               else if debug
-                   then error $ "Term not live: " ++ "\n" ++ (analyze out)
-                   else return False
-       [] -> return True
+                   then error $ "Term not live: " ++(show $ L.map pprintType ty) ++ "\n" ++ (analyze out)
+                   else return ("Term not live: " ++ "\n" ++ (analyze out))
+       [] -> return ("Term is live")
 
 analyze :: [GoType] -> String
 analyze gt = intercalate ";\n" (map notSynch gt)

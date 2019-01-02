@@ -67,7 +67,7 @@ main = do
                      let listsys = succs bound ty
                      let !tylist = runFreshM listsys
                      putStrLn $ "TyList Completa: " ++ show tylist
---                     putStrLn $ "Len de la tylist: " ++ show (length tylist)
+                     putStrLn $ "Len de la tylist: " ++ show (length tylist)
 --                     putStrLn $ "Bound (k): "++(show bound)
 --                     putStrLn $ "Number of k-states: "++(show $ length tylist)
                      when ((check pargs) ==  Debug || (check pargs)==List) $ do
@@ -75,12 +75,12 @@ main = do
                        putStrLn $ "\n[Debug]k-reachable states:\n"++(pprintTypeList debugty)
                      when ((check pargs) ==  Liveness || (proceed pargs)) $
                        do let live = runFreshM $ liveness ((check pargs) ==  Debug) bound listsys
-                          printResult "Liveness" $ if (kbound pargs) == 888
-                                                   then mapLiveness bound tylist
-                                                   else live
+                          putStrLn ("Liveness: " ++ if (kbound pargs) == 888
+                                                   then show (mapLiveness bound tylist)
+                                                   else live)
                      when ((check pargs) ==  Safety || (proceed pargs)) $
                        do let safe = runFreshM $ safety ((check pargs) ==  Debug) bound listsys
-                          printResult "Safety" safe
+                          putStrLn ("Safety: " ++ safe)
                      
                      else do selectColor False
                              putStrLn $ (gofile pargs)++" is not fenced"

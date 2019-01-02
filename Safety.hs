@@ -79,7 +79,7 @@ checkAllSuccs names k sys prev (x:next) =
 
 
 
-safety :: Bool -> Int -> M [Eqn] -> M Bool
+safety :: Bool -> Int -> M [Eqn] -> M String
 safety debug k eqs =
   do list <- eqs
      case list of
@@ -91,9 +91,9 @@ safety debug k eqs =
             if L.null out
               then safety debug k $ return xs
               else if debug
-                   then error $ "Term not safe: " ++ "\n" ++ findCollidingOperations (foldr (\x rec -> if (foldr (\y recBool -> x `aeq` y || recBool) False rec) then rec else (x:rec)) [] out)
-                   else return False
-       [] -> return True
+                   then error $ "Term not safe: " ++ (show $ L.map pprintType ty) ++ "\n" ++ findCollidingOperations (foldr (\x rec -> if (foldr (\y recBool -> x `aeq` y || recBool) False rec) then rec else (x:rec)) [] out)
+                   else return ("Term not safe: " ++ "\n" ++ findCollidingOperations (foldr (\x rec -> if (foldr (\y recBool -> x `aeq` y || recBool) False rec) then rec else (x:rec)) [] out))
+       [] -> return ("Term is Safe")
 
 
 --filterEquivalentBadMatch :: [(GoType,GoType)] -> [(GoType,GoType)]
