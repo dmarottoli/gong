@@ -90,7 +90,7 @@ addToLine t newLine = t
 getLineFromGT :: GoType -> String
 getLineFromGT (Send line _ _) = "SEND on line " ++ line
 getLineFromGT (Recv line _ _) = "RECV on line " ++ line
-getLineFromGT (Tau line _) = "TIMED event on line " ++ line
+getLineFromGT (Tau line _) = if ((getTopOfLineNumberStack line)  /= "") then "TIMED event on line " ++ line else (getRestOfLineNumberStack line)
 getLineFromGT (IChoice line _ _) = line
 getLineFromGT (OChoice line _) = line
 --getLineFromGT (Par line _) = (getTopOfLineNumberStack line) ++"SPWN" ++ getRestOfLineNumberStack line
@@ -102,7 +102,7 @@ getLineFromGT t = ""
 getLineFromSynched :: GoType -> GoType -> String
 getLineFromSynched (Send line _ _) t = "SEND on line " ++ (getTopOfLineNumberStack line) ++ "\n\t" ++ replaceNewLines (getLineFromGT t) ++ (getRestOfLineNumberStack line)
 getLineFromSynched (Recv line _ _) t = "RECV on line " ++ (getTopOfLineNumberStack line) ++ "\n\t" ++ replaceNewLines (getLineFromGT t) ++ (getRestOfLineNumberStack line)
-getLineFromSynched (Tau line _) t = "TIMED event on line " ++ line
+getLineFromSynched (Tau line _) t = if ((getTopOfLineNumberStack line) /= "") then "TIMED event on line " ++ line else (getRestOfLineNumberStack line)
 --getLineFromSynched (Tau line _) _ = "TIMED event on line " ++ (getTopOfLineNumberStack line) ++ "\n\t" ++ replaceNewLines (getLineFromGT t) ++ (getRestOfLineNumberStack line)
 getLineFromSynched t1 t2 = getLineFromGT t1
 

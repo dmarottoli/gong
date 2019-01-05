@@ -1,0 +1,18 @@
+def main.main():
+    let t0 = newchan main.main.t0_0_0, 1 @4;
+    spawn main.sendAndClose(t0) @5;
+    spawn main.recvAndClose(t0) @6;
+def main.sendAndClose(ch):
+    call main.sendAndClose#1(ch) @0;
+def main.sendAndClose#1(ch):
+    select
+      case recv ch @12; call main.sendAndClose#1(ch) @0;
+      case send ch @13; close ch @14; call main.sendAndClose#1(ch) @0;
+    endselect;
+def main.recvAndClose(ch):
+    call main.recvAndClose#1(ch) @0;
+def main.recvAndClose#1(ch):
+    select
+      case recv ch @22; close ch @23; call main.recvAndClose#1(ch) @0;
+      case send ch @24; call main.recvAndClose#1(ch) @0;
+    endselect;

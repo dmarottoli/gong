@@ -1,0 +1,6 @@
+def main.main():
+    let t0 = newchan main.main.t0_0_0, 0 @8;
+    spawn main.fib(t0) @9;
+    recv t0 @10;
+def main.fib(ch):
+    if send ch @15; else let t1 = newchan main.fib.t1_0_0, 2 @18; spawn main.fib(t1) @19; spawn main.fib(t1) @20; recv t1 @21; recv t1 @21; recv t1 @21; send ch @21; endif;

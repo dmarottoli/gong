@@ -88,7 +88,7 @@ getGuardsCont :: GoType -> [(GoType, GoType)]
 getGuardsCont (Send l n t) = [(Send l n Null, t)]
 getGuardsCont (Recv l n t) = [(Recv l n Null, t)]
 getGuardsCont (Tau l t) = [(Tau l Null, t)]
-getGuardsCont (IChoice line t1 t2) = [(Tau line Null, addToLine t1 line ), (Tau line Null, addToLine t2 line )]
+getGuardsCont (IChoice line t1 t2) = [(Tau line Null, t1), (Tau line Null, t2)]
 getGuardsCont (OChoice line xs) = L.foldr (++) [] $ map getGuardsCont (map (\x -> addToLine x line) xs)
 getGuardsCont (Close l c ty) = [(Close l c Null, ty)]
 getGuardsCont (Buffer c (open,b,k))

@@ -1,0 +1,7 @@
+def main.main():
+    let t0 = newchan main.main.t0_0_0, 0 @4;
+    spawn main.send(t0) @5;
+    recv t0 @6;
+    recv t0 @7;
+def main.send(ch):
+    send ch @11;

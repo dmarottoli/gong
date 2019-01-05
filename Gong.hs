@@ -77,7 +77,7 @@ main = do
                        do let live = runFreshM $ liveness ((check pargs) ==  Debug) bound listsys
                           putStrLn ("Liveness: " ++ if (kbound pargs) == 888
                                                    then show (mapLiveness bound tylist)
-                                                   else live)
+                                                   else live ++ "\n")
                      when ((check pargs) ==  Safety || (proceed pargs)) $
                        do let safe = runFreshM $ safety ((check pargs) ==  Debug) bound listsys
                           putStrLn ("Safety: " ++ safe)

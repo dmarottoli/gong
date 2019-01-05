@@ -1,0 +1,8 @@
+def main.main():
+    let t0 = newchan main.main.t0_0_0, 2 @4;
+    send t0 @5;
+    send t0 @6;
+    send t0 @7;
+    recv t0 @8;
+    recv t0 @9;
+    recv t0 @10;

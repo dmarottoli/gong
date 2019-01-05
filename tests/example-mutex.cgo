@@ -1,0 +1,10 @@
+def main.main():
+    let t2 = newchan main.main.t0_0_0, 1 @23;
+    spawn main.update(t2) @26;
+    spawn main.update(t2) @27;
+    send t2 @28;
+def main.update(t2):
+    call main.ValueUpdater.UpdateGlobal(t2) @33;
+def main.ValueUpdater.UpdateGlobal(t2):
+    recv t2 @17;
+    send t2 @18;
