@@ -259,7 +259,7 @@ transformSeq vars (x:xs) =
     (Spawn line s l) -> throwError l vars $
                    GT.Par (addLine line "") [(GT.ChanInst (GT.TVar (addLine line "SPAWN on Line ") (s2n s)) (L.map s2n l)) , (transformSeq vars xs)]
 
-    (NewChan line s1 s2 n) -> GT.New (show line) (fromIntegral n) (bind (s2n s1) (transformSeq (s1:vars) xs))
+    (NewChan line s1 s2 n) -> GT.New "" (fromIntegral n) (bind (s2n s1) (transformSeq (s1:vars) xs))
     
     (If p1 p2) -> GT.IChoice "" (transform vars p1) (transform vars p2)
     

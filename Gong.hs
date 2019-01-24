@@ -59,14 +59,14 @@ main = do
     Left err -> print err
     Right ty -> do if runCheck ((check pargs) ==  Debug) ty
                      then do
-                     putStrLn $ "kbound " ++ show ty
+--                     putStrLn $ "kbound " ++ show ty
                      let bound =  if (kbound pargs) == -1 || (kbound pargs) == 888
                                   then maximum [maxnestednames ty, sizeOfEqs ty]
                                   else kbound pargs
-                     putStrLn $ "bound: " ++ show bound;
+--                     putStrLn $ "bound: " ++ show bound;
                      let listsys = succs bound ty
                      let !tylist = runFreshM listsys
-                     putStrLn $ "TyList Completa: " ++ show tylist
+--                     putStrLn $ "TyList Completa: " ++ show tylist
                      putStrLn $ "Len de la tylist: " ++ show (length tylist)
 --                     putStrLn $ "Bound (k): "++(show bound)
 --                     putStrLn $ "Number of k-states: "++(show $ length tylist)

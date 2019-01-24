@@ -2,15 +2,15 @@
 -- it is live and safe
 -- and should take about 20s to be checked
 --
-def t0() : let a = newchan ty, 1 ; 
-	   spawn fib(a);
-	   recv a;
+def t0() : let a = newchan ty, 1 @1; 
+	   spawn fib(a) @2;
+	   recv a @3;
 
 def fib(x): if
-		send x;
-            else let b = newchan ty, 1 ; 
-		 spawn fib(b);
- 		 spawn fib(b);
-		 recv b; recv b; send x;
+		send x @7;
+            else let b = newchan ty, 1 @8; 
+		 spawn fib(b) @9;
+ 		 spawn fib(b) @10;
+		 recv b @11; recv b @12; send x @13;
 	    endif;
 
