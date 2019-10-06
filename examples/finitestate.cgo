@@ -1,0 +1,16 @@
+def t0() : let a = newchan ty, 0 @1; 
+           let b = newchan ty, 0 @2;
+	   spawn w(a) @3;
+	   spawn r(a,b) @4;
+
+def r(x,y): 
+		--close y @12;
+		let c = newchan ty, 0 @5;
+            recv x @6; 
+			--close c @11;
+	    call r(x,c) @7;
+
+	      
+def w(x): send x @8;
+          send x @9;
+     	  call w(x) @10;

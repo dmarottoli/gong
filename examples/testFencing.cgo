@@ -1,0 +1,17 @@
+def main.main():
+    let t0 = newchan main.main.t0_0_0, 0@14;
+    spawn main.createProducerConsumerAndNotify(t0)@16;
+    recv t0@20;
+def main.createProducerConsumerAndNotify(ch):
+    call main.createProducerConsumerAndNotify#1(ch)@0;
+def main.createProducerConsumerAndNotify#1(ch):
+    let t1 = newchan main.p.t1_0_0, 0@27;
+    spawn main.producer(t1)@28;
+    spawn main.consumer(t1)@29;
+    if call main.createProducerConsumerAndNotify#1(ch)@0; else call main.createProducerConsumerAndNotify#2(ch)@0; endif;
+def main.createProducerConsumerAndNotify#2(ch):
+    send ch@31;
+def main.producer(ch):
+    send ch@6;
+def main.consumer(ch):
+    recv ch @10;

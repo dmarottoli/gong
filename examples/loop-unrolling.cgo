@@ -1,0 +1,25 @@
+def main.main#6():
+    let t16 = newchan main.main.t16_0_0, 0 @17;
+    recv t16 @18;
+    call main.main#6(t16) @0;
+    let t16 = newchan main.main.t16_0_1, 0 @17;
+    recv t16 @18;
+    call main.main#6(t16, t16) @0;
+    let t16 = newchan main.main.t16_0_2, 0 @17;
+    recv t16 @18;
+    call main.main#6(t16, t16, t16) @0;
+    let t16 = newchan main.main.t16_0_3, 0 @17;
+    recv t16 @18;
+    call main.main#6(t16, t16, t16, t16) @0;
+    let t16 = newchan main.main.t16_0_4, 0 @17;
+    recv t16 @18;
+    call main.main#6(t16, t16, t16, t16, t16) @0;
+    let t16 = newchan main.main.t16_0_5, 0 @17;
+    recv t16 @18;
+    call main.main#6(t16, t16, t16, t16, t16, t16) @0;
+    let t16 = newchan main.main.t16_0_6, 0 @17;
+    recv t16 @18;
+    call main.main#6(t16, t16, t16, t16, t16, t16, t16) @0;
+    let t16 = newchan main.main.t16_0_7, 0 @17;
+    recv t16 @18;
+    call main.main#6(t16, t16, t16, t16, t16, t16, t16, t16) @0;

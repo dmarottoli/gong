@@ -20,20 +20,20 @@ import Debug.Trace
 
 
 getContinuation :: GoType -> Maybe [GoType]
-getContinuation (Close _ c ty) = Just [ty, Buffer c (False, 0,0)] -- DEAL WITH BUFFER
+getContinuation (Close line c ty) = Just [addToLine ty ("CLOSE operation on line " ++ line), Buffer c (False, 0,0)] -- DEAL WITH BUFFER
 getContinuation _ = Nothing
 
 closebarbs :: GoType -> [GoType]
 closebarbs (Close l c ty) = [Close l c Null]
 closebarbs t = []
 
-forbiddenAction :: GoType -> [GoType]
-forbiddenAction (Send l n t) = [Send l n Null]
-forbiddenAction (Close l c ty) = [Close l c Null]
-forbiddenAction (New i bnd) = let (c,ty) = unsafeUnbind bnd
-                              in forbiddenAction ty
-forbiddenAction (Par xs) = L.foldr (++) [] $ L.map forbiddenAction xs
-forbiddenAction t = []
+forbiddenAction :: GoType -> GoType -> [GoType]
+forbiddenAction (Send l n t) _ = [Send l n Null]
+forbiddenAction (Close l c ty) _ = [Close l c Null]
+forbiddenAction (New _ i bnd) t2 = let (c,ty) = unsafeUnbind bnd
+                              in forbiddenAction ty t2
+forbiddenAction (Par _ xs) c = L.foldr (++) [] $ L.map (flip forbiddenAction c) xs
+forbiddenAction t _ = []
 
 
 badmatch :: GoType -> GoType -> Bool
@@ -42,22 +42,20 @@ badmatch (Close _ c ty) (Close _ n t) = c == n
 badmatch _ _ = False
 
 
-noclose :: [GoType] -> [GoType] -> Bool
-noclose [] [] = True
+noclose :: [GoType] -> [GoType] -> [(GoType, GoType)]
+noclose [] [] = []
 noclose list@(x:xs) ys =
   let prod = cartProd list ys
-  in L.null $ L.filter (\(x,y) -> badmatch x y) prod
+  in L.filter (\(x,y) -> badmatch x y) prod
 
 
-checkPair :: GoType -> GoType -> Bool
-checkPair t1 t2 = noclose (closebarbs t1) (forbiddenAction t2)
+checkPair :: GoType -> GoType -> [(GoType, GoType)]
+checkPair t1 t2 = noclose (closebarbs t1) (forbiddenAction t2 t1)
 
 
-checkList :: GoType -> [GoType] -> Bool
-checkList _ [] = True
-checkList current (x:xs) = if (checkPair current x)
-                           then (checkList current xs)
-                           else False -- error $ "Term no safe: "++(pprintType x)
+checkList :: GoType -> [GoType] -> [(GoType, GoType)]
+checkList _ [] = []
+checkList current (x:xs) = (checkPair current x) ++ (checkList current xs)
                            
                            
 
@@ -65,23 +63,23 @@ checkList current (x:xs) = if (checkPair current x)
 -- Given a parallel composition of type, check whether each
 -- one can make a move
 --
-checkAllSuccs :: [ChName] -> Int -> Rec [(EqnName, Embed GoType)] -> [GoType] -> [GoType] -> M Bool
-checkAllSuccs names k sys prev [] = return True
+checkAllSuccs :: [ChName] -> Int -> Rec [(EqnName, Embed GoType)] -> [GoType] -> [GoType] -> M [(GoType, GoType)]
+checkAllSuccs names k sys prev [] = return []
 checkAllSuccs names k sys prev (x:next) =
   case getContinuation x of
     Just ty -> 
-      do  let temp = succsNode k names (EqnSys $ bind sys (Par (prev++ty++next))) :: M [Eqn]
+      do  let temp = succsNode k names (EqnSys $ bind sys (Par "s" (prev++ty++next))) :: M [Eqn]
           nexts <- temp
           gotypes <- eqnToTypes temp
           rest <- (checkAllSuccs names k sys (prev++[x]) next)
-          return $ (checkList x gotypes) && rest
+          return $ ((checkList x gotypes) ++ rest)
     Nothing ->  checkAllSuccs names k sys (prev++[x]) next
 
 
 
 
 
-safety :: Bool -> Int -> M [Eqn] -> M Bool
+safety :: Bool -> Int -> M [Eqn] -> M String
 safety debug k eqs =
   do list <- eqs
      case list of
@@ -89,39 +87,55 @@ safety debug k eqs =
          do (defs, main) <- unbind bnd
             ty <- extractType (return main)
             let names = L.nub $ fv ty
-            out <- checkAllSuccs names k defs [] ty
-            if out
+            out <- --trace ("names = " ++ show names ++ "\n" ++ "ty = " ++ show ty) $ 
+                   checkAllSuccs names k defs [] ty
+            --traceM("out ------- " ++ (show out))
+            if L.null out
               then safety debug k $ return xs
               else if debug
-                   then error $ "Term not safe: " ++ show ty ++ "\n" ++ show (findCollidingOperations ty)
-                   else return False
-       [] -> return True
+                   then error $ "Term not safe: " ++ (show $ L.map pprintType ty) ++ "\n" ++ findCollidingOperations (foldr (\x rec -> if (foldr (\y recBool -> x `aeq` y || recBool) False rec) then rec else (x:rec)) [] out)
+                   else return ("Term not safe: " ++ "\n" ++ findCollidingOperations (foldr (\x rec -> if (foldr (\y recBool -> x `aeq` y || recBool) False rec) then rec else (x:rec)) [] out))
+       [] -> return ("Term is Safe")
 
 
-thereIsASend :: [GoType] -> Bool
-thereIsASend xs = length (filter (\x -> case x of (Send l ch _) -> True; otherwise -> False) xs) > 0
+--filterEquivalentBadMatch :: [(GoType,GoType)] -> [(GoType,GoType)]
+--filterEquivalentBadMatch [] = []
+--filterEquivalentBadMatch (x:xs) = (itsUnique x xs)++(filterEquivalentBadMatch xs)
+--
+--itsUnique :: (GoType, GoType) -> [(GoType, GoType)] ->[(GoType, GoType)]
+--itsUnique g gs = if (foldr (\x rec -> g `aeq` x || rec) False gs) then [] else [g]
+--
+--sameForbiddenAction :: (GoType, GoType) -> (GoType, GoType) -> Bool
+--sameForbiddenAction (g1, g2) (t1, t2) = ((g1 `aeq` t1) && (g2 `aeq` t2)) || ((g1 `aeq` t2) && (g2 `aeq` t1))
+--
+--thereIsASend :: [GoType] -> Bool
+--thereIsASend xs = length (filter (\x -> case x of (Send l ch _) -> True; otherwise -> False) xs) > 0
 
 
-findCollidingOperations :: [GoType] -> String
-findCollidingOperations (x:xs) = case x of
-                            (Close line ch _) -> "There is a closing operation on line " ++ show line ++ " colliding with a " ++ collidingOperation xs ch
-                            (Send line ch _) -> "There is a send operation on line " ++ show line ++ " colliding with a " ++ nextCloseStatementLine xs ch
-                            otherwise -> findCollidingOperations xs
+findCollidingOperations :: [(GoType, GoType)] -> String
+findCollidingOperations gts = intercalate ";\n" (map printColliding gts)
+
+printColliding :: (GoType, GoType) -> String
+printColliding (t1, t2) = "There is a " ++ operation t1 ++ "\n Colliding with:\nA " ++ operation t2 ++ "."
+
+operation :: GoType -> String
+operation (Close line ch t) = "close operation on line " ++ line
+operation (Send line ch t) = "send operation on line " ++ line
 
 -- we still need to check that the operations are done on the same channel
-collidingOperation :: [GoType] -> ChName -> String
-collidingOperation xs ch = let sends = filter (\x -> case x of (Send l ch _)-> True; otherwise -> False) xs in
-                            if (length sends) > 0
-                               then
-                                  case (head sends) of (Send line ch _) -> "send operation on line " ++ show line
-                               else
-                                  nextCloseStatementLine xs ch
-
-
-nextCloseStatementLine :: [GoType] -> ChName -> String
-nextCloseStatementLine xs ch = let closes = filter (\x -> case x of (Close l ch _)-> True; otherwise -> False) xs in
-                                    if (length closes) > 0
-                                        then
-                                            case (head closes) of (Close line _ _) -> "close operation on line " ++ show line
-                                        else
-                                            "unknown operation"
+--collidingOperation :: [GoType] -> ChName -> String
+--collidingOperation xs ch = let sends = filter (\x -> case x of (Send l ch _)-> True; otherwise -> False) xs in
+--                            if (length sends) > 0
+--                               then
+--                                  case (head sends) of (Send line ch _) -> "send operation on line " ++ show line
+--                               else
+--                                  nextCloseStatementLine xs ch
+--
+--
+--nextCloseStatementLine :: [GoType] -> ChName -> String
+--nextCloseStatementLine xs ch = let closes = filter (\x -> case x of (Close l ch _)-> True; otherwise -> False) xs in
+--                                    if (length closes) > 0
+--                                        then
+--                                            case (head closes) of (Close line _ _) -> "close operation on line " ++ show line
+--                                        else
+--                                            "unknown operation"

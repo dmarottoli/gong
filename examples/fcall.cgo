@@ -1,0 +1,12 @@
+def main.main():
+    let t5 = newchan main.main.t5_0_0, 0 @19;
+    call main.f() @20;
+    call main.g() @21;
+    call main.main$1() @24;
+    recv t0 @24;
+def main.f():
+    call main.g() @9;
+def main.g():
+    recv t5 @13;
+def main.main$1():
+    let t0 = newchan main.main$1.t0_0_0, 0 @22;

@@ -1,0 +1,14 @@
+def main.main():
+    let t0 = newchan main.main.t0_0_0, 0 @22;
+    let t1 = newchan main.main.t1_0_0, 0 @23;
+    spawn main.x(t1, t0) @24;
+    call main.main#1(t0, t1) @0;
+def main.main#1(t0, t1):
+    select
+      case recv t1 @28; call main.main#1(t0, t1, t0, t1) @0;
+      case recv t0 @30;
+    endselect;
+def main.x(ch, done):
+    call main.x#1(ch, done) @0;
+def main.x#1(ch, done):
+    if send ch @11; call main.x#1(ch, done) @0; else call main.x#1(ch, done) @0; endif;

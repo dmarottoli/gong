@@ -5,7 +5,6 @@ import GoTypes
 import SymbolicSem
 import Utils
 import PrettyGoTypes
-import Data.List
 
 
 import Unbound.LocallyNameless
@@ -26,19 +25,18 @@ import Debug.Trace
 
 -- Barbs of a "sequential" type
 barbs :: GoType -> [GoType]
-barbs (Send l n t) = [Send l n Null]
-barbs (Recv l n t) = [Recv l n Null]
-barbs (OChoice _ xs) = L.foldr (++) [] $ L.map barbs xs
-barbs (New _ i bnd) = let (c,ty) = unsafeUnbind bnd
-                      in barbs ty
-barbs (Par _ xs) = L.foldr (++) [] $ L.map barbs xs
+barbs (Send n t) = [Send n Null]
+barbs (Recv n t) = [Recv n Null]
+barbs (OChoice xs) = L.foldr (++) [] $ L.map barbs xs
+barbs (New i bnd) = let (c,ty) = unsafeUnbind bnd
+                    in barbs ty
+barbs (Par xs) = L.foldr (++) [] $ L.map barbs xs
 barbs (Buffer c (open,b,k))
-  | (k < b) && (k > 0) = [Send "BUFFER" c Null, Recv "BUFFER" c Null]
-  | k > 0 = [Send "BUFFER" c Null]
-  | k < b && open = [Recv "BUFFER" c Null]
-  | k < b && not open = [Recv "BUFFER" c Null, Send "BUFFER" c Null]
-  | not open = [Send "BUFFER" c Null]
-  | otherwise = []
+  | (k < b) && (k > 0) = [Send c Null, Recv c Null]
+  | k > 0 = [Send c Null]
+  | k < b = [Recv c Null]
+  | not open = [Send c Null]
+  | otherwise = [] 
 barbs t = []
 
 
@@ -56,7 +54,7 @@ matchTypes current candidate =
 
 findMatch :: GoType -> [GoType] -> Bool
 findMatch _ [] = False
-findMatch t@(OChoice _ ys) (x:xs) = if any isTau ys
+findMatch t@(OChoice ys) (x:xs) = if any isTau ys
                                   then True
                                   else (matchTypes t x)
                                        ||
@@ -78,62 +76,55 @@ eqnToTypes mlist = do list <- mlist
 -- Given a parallel composition of type, check whether each
 -- one can make a move
 --
-checkStates :: [ChName] -> Int -> Rec [(EqnName, Embed GoType)] -> [GoType] -> [GoType] -> M [GoType]
-checkStates names k sys prev [] = return []
+
+
+
+
+checkStates :: [ChName] -> Int -> Rec [(EqnName, Embed GoType)] -> [GoType] -> [GoType] -> M Bool
+checkStates names k sys prev [] = return True
 checkStates names k sys prev (x:next) =
   if isBuffer x
   then checkStates names k sys (prev++[x]) next
   else
-    do  let temp = succsNode k names (EqnSys $ bind sys (Par "" (prev++next))) :: M [Eqn] in
-            do
-                nexts <- temp
-                gotypes <- eqnToTypes temp
-                rest <- --trace ("\n tempGo = " ++ show gotypes ++ "\n" ++ "x = " ++ show x ++ "\n" ++ "prevNext = " ++ show (prev++next) ++ "\n" ++ "\n") $ 
-                   (checkStates names k sys (prev++[x]) next)
-                return $ if (not (findMatch x gotypes)) then (x:rest) else rest
---                  (
---                   -- if
---                    (findMatch x gotypes)
---                    -- then True
---                    -- else error $ show (pprintType x ,L.map pprintType gotypes)
---                  )
---                  && rest
+    do  let temp = succsNode k names (EqnSys $ bind sys (Par (prev++next))) :: M [Eqn]
+        nexts <- temp
+        gotypes <- eqnToTypes temp
+        rest <- (checkStates names k sys (prev++[x]) next)
+        return $
+          (
+            --if
+            --trace ("\n GOTYPES: " ++ show gotypes ++ "\n X: " ++ show x ++ "\n Names: " ++ show names ++ "\n Prev: " ++ show prev ++ "\n Next: " ++ show next ++ "\n Sys: " ++ show sys) $ 
+            (findMatch x gotypes)
+            -- then True
+            -- else error $ show (pprintType x ,L.map pprintType gotypes)
+          )
+          && rest
 
 
-liveness :: Bool -> Int -> M [Eqn] -> M String
+liveness :: Bool -> Int -> M [Eqn] -> M Bool
 liveness debug k eqs =
   do list <- eqs
      case list of
        (sys@(EqnSys bnd):xs) ->
          do (defs, main) <- unbind bnd
-            ty <-  --trace ("main = " ++ show main ++ "\n") $
+            ty <- -- trace (show (defs,main)) $
                   extractType (return main)
             let names = L.nub $ fv ty :: [ChName]
-            out <- --trace ("names = " ++ show names ++ "\n" ++ "ty = " ++ show ty) $
-               checkStates names k defs [] ty
-            --traceM("out ------- " ++ (show out))
-            if L.null out
+            out <- checkStates names k defs [] ty
+            if out
               then liveness debug k $ return xs
               else if debug
-                   then error $ "Term not live: " ++(show $ L.map pprintType ty) ++ "\n" ++ (analyze out)
-                   else return ("Term not live: " ++ "\n" ++ (analyze out))
-       [] -> return ("Term is live")
+                   then error $ "Term not live: " ++(show $ L.map pprintType ty)
+                   else return False
+       [] -> return True
 
-analyze :: [GoType] -> String
-analyze gt = intercalate ";\n" (map notSynch gt)
---analyze [] = ""
---analyze (x:xs) = notSynch x ++ analyze xs
 
-notSynch :: GoType -> String
-notSynch gt = case gt of
-                (Send l c _) -> "There is a Send operation without synch on line " ++ l
-                (Recv l c _) -> "There is a Recv operation without synch on line " ++ l
-                otherwise -> ""
+
 
 -- ATTEMPT AT PARALLELISATION OF LIVENESS
 --
 atomLiveness :: Int -> Eqn -> Bool
-atomLiveness k eq = L.null (runFreshM $ helper k eq)
+atomLiveness k eq = runFreshM $ helper k eq
   where helper k eq =
           case eq of
             sys@(EqnSys bnd) ->

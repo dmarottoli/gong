@@ -1,0 +1,8 @@
+-- This example illustrates closing of channels this example is *not*
+-- safe because channel 'a' is closed twice
+-- it is however live.
+--
+def t0() : let a = newchan ty, 0 @1; 
+    	   close a @2;
+		   recv a @3;
+

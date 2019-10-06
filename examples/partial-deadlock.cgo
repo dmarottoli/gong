@@ -1,0 +1,14 @@
+def main.main():
+    let t0 = newchan main.main.t0_0_0, 0 @4;
+    spawn main.deadlock(t0) @5;
+    let t1 = newchan main.main.t1_0_0, 0 @6;
+    call main.main#1(t0, t1) @0;
+def main.main#1(t0, t2):
+    spawn main.produce(t2) @8;
+    recv t2 @9;
+    let t4 = newchan main.main.t4_0_0, 0 @10;
+    call main.main#1(t2, t4) @0;
+def main.deadlock(ch):
+    recv ch @17;
+def main.produce(ch):
+    send ch @21;
