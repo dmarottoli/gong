@@ -41,39 +41,39 @@ amper = text "&"
 tau = text "tau"
 
 instance Pretty GoType where
-  ppr (Send c t) = do
+  ppr (Send l c t) = do
    t' <- ppr t
    c' <- ppr c
    return $ c' <> bang <> PP.semi <> t'
-  ppr (Recv c t) = do
+  ppr (Recv l c t) = do
    t' <- ppr t
    c' <- ppr c
    return $ c' <> qmark <> PP.semi <> t'
-  ppr (Tau t) = do
+  ppr (Tau l t) = do
    t' <- ppr t
    return $ tau <> PP.semi <> t'
-  ppr (IChoice t1 t2) = do
+  ppr (IChoice _ t1 t2) = do
    t1' <- ppr t1
    t2' <- ppr t2
    return $ oplus <> PP.braces (t1' <+> PP.comma <+> t2')
-  ppr (OChoice l) = do
+  ppr (OChoice _ l) = do
    l' <- mapM ppr l
    let prettyl = punctuate PP.comma l'
    return $ amper <> PP.braces (hsep prettyl)
-  ppr (Par l) = do
+  ppr (Par line l) = do
    l' <- mapM ppr l
    let prettyl = punctuate (PP.space <> PP.text "|") l'
    return $ (hsep prettyl)
-  ppr (New i bnd) = lunbind bnd $ \(c,t) -> do
+  ppr (New _ i bnd) = lunbind bnd $ \(c,t) -> do
       c' <- ppr c
       t' <- ppr t
       return $ PP.text "new" <+> (PP.int i) <+> c' <> dot <> (PP.parens t')
   ppr (Null) = return $ text "0"
-  ppr (Close c t) = do
+  ppr (Close l c t) = do
       t' <- ppr t
       c' <- ppr c
       return $ PP.text "close " <> c' <> PP.semi <> t'
-  ppr (TVar x) = ppr x
+  ppr (TVar _ x) = ppr x
   ppr (ChanInst t plist) = do
       t' <- ppr t
       l' <- mapM ppr plist
@@ -84,7 +84,7 @@ instance Pretty GoType where
       l' <- mapM ppr lc
       let plist' = punctuate PP.comma l'
       return $ brackets (hsep plist') <+> t'
-  ppr (Seq l) = do
+  ppr (Seq line l) = do
     l' <- mapM ppr l
     let plist = punctuate PP.semi l'
     return $ hsep plist

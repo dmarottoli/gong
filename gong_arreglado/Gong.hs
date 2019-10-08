@@ -5,8 +5,10 @@ import GoTypes
 import PrettyGoTypes (pprintEqn, pprintType, pprintTypeList)
 import SymbolicSem
 import Liveness
+import OpenChannels
 import Safety
 import TypeSize (maxnestednames, sizeOfEqs)
+import Data.Char
 
 import Data.List as L
 import Unbound.LocallyNameless (runFreshM,unbind)
@@ -53,6 +55,7 @@ main :: IO ()
 main = do
   pargs <- cmdArgs (modes [subargs])
   tyfile <- (readFile $ gofile pargs)
+--  putStrLn $ "tyfileeee: " ++ tyfile
   case fullPass tyfile of
     Left err -> print err
     Right ty -> do if runCheck ((check pargs) ==  Debug) ty
@@ -61,23 +64,28 @@ main = do
                      let bound =  if (kbound pargs) == -1 || (kbound pargs) == 888
                                   then maximum [maxnestednames ty, sizeOfEqs ty]
                                   else kbound pargs
+                     --putStrLn $ "bound: " ++ show bound;
                      let listsys = succs bound ty
                      let !tylist = runFreshM listsys
+                     --writeFile "prueba2.txt" (show tylist)
                      putStrLn $ "\n TyList Completa: " ++ show tylist
-                     putStrLn $ "\n Bound (k): "++(show bound)
-                     putStrLn $ "\n Number of k-states: "++(show $ length tylist)
+                     --putStrLn $ "Len de la tylist: " ++ show (length tylist)
+                     --putStrLn $ "Bound (k): "++(show bound)
+                     --putStrLn $ "Number of k-states: "++(show $ length tylist)
                      when ((check pargs) ==  Debug || (check pargs)==List) $ do
                        let debugty = runFreshM $ getTypes tylist
                        putStrLn $ "\n[Debug]k-reachable states:\n"++(pprintTypeList debugty)
                      when ((check pargs) ==  Liveness || (proceed pargs)) $
                        do let live = runFreshM $ liveness ((check pargs) ==  Debug) bound listsys
-                          printResult "\n Liveness" $ if (kbound pargs) == 888
-                                                   then mapLiveness bound tylist
-                                                   else live
+                          putStrLn ("Liveness: " ++ if (kbound pargs) == 888
+                                                   then show (mapLiveness bound tylist)
+                                                   else live ++ "\n")
                      when ((check pargs) ==  Safety || (proceed pargs)) $
                        do let safe = runFreshM $ safety ((check pargs) ==  Debug) bound listsys
-                          printResult "\n Safety" safe
-                     
+                          putStrLn ("Safety: " ++ safe ++ "\n")
+                     when ((check pargs) ==  Safety || (proceed pargs)) $
+                       do let oc = runFreshM $ openChannels ((check pargs) ==  Debug) bound listsys
+                          putStrLn ("Open Channels: " ++ oc ++ "\n")
                      else do selectColor False
                              putStrLn $ (gofile pargs)++" is not fenced"
                              setSGR [Reset]

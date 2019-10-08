@@ -408,9 +408,12 @@ itparser =
      ; return $ (Cl c) }
   <|>
   do { reserved "spawn"
-     ; x <- identifier
-     ; list <- parens (P.sepBy1 identifier (P.char ','))
-     ; return $ Spawn x list }
+          ; x <- identifier
+          ; list <- parens (P.sepBy identifier (P.char ',' <* P.spaces))
+          ; symbol ";"
+          ; line <- many $ P.digit
+          ; let l = read line :: Int in
+          return $ Spawn l x list }
   <|>
   do { reserved "select"
      ; l <- many (reserved "case" *> seqInterm)

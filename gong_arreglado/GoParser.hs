@@ -8,6 +8,7 @@ import Control.Monad.Trans.Maybe
 import Data.Functor
 import Data.List as L
 import Data.Set as S
+import Data.Char as C
 import Data.Maybe
 import Control.Applicative ((<*),(*>))
 import Unbound.LocallyNameless
@@ -34,15 +35,15 @@ instance Functor Prog where
     fmap f (P l) = P (fmap (fmap f) l)
                      
 data Interm = Seq [Interm]
-              | Call String [String]
-              | Cl String
-              | Spawn String [String]
-              | NewChan String String Integer
+              | Call Int String [String]
+              | Cl Int String
+              | Spawn Int String [String]
+              | NewChan Int String String Integer
               | If Interm Interm
               | Select [Interm]
-              | T
-              | S String
-              | R String
+              | T Int
+              | S Int String
+              | R Int String
               | Zero
          deriving (Eq, Show)
 
@@ -126,12 +127,18 @@ itparser :: P.Parser Interm
 itparser = 
   do { reserved  "close"
      ; c <- identifier
-     ; return $ (Cl c) }
+     ; symbol "@"
+     ; line <- many $ P.digit
+     ; let l = read line :: Int in
+            return $ (Cl l c) }
   <|>
   do { reserved "spawn"
      ; x <- identifier
      ; list <- parens (P.sepBy identifier (P.char ',' <* P.spaces))
-     ; return $ Spawn x list }
+     ; symbol "@"
+     ; line <- many $ P.digit
+     ; let l = read line :: Int in
+            return $ Spawn l x list }
   <|>
   do { reserved "select"
      ; l <- many (reserved "case" *> seqInterm)
@@ -145,7 +152,10 @@ itparser =
      ; t <- identifier
      ; symbol ","
      ; n <- natural
-     ; return $ NewChan x t n }
+     ; symbol "@"
+     ; line <- many $ P.digit
+     ; let l = read line :: Int in
+            return $ NewChan l x t n }
   <|>
   do { reserved "if"
      ; t <- seqInterm
@@ -155,20 +165,32 @@ itparser =
      ; return $ If t e }
   <|>
   do { reserved "tau"
-     ; return $ T   }
+     ; symbol "@"
+     ; line <- many $ P.digit
+     ; let l = read line :: Int in
+            return $ T l  }
   <|>
   do { reserved "send"
      ; c <- identifier
-     ; return $ S c  }
+     ; symbol "@"
+     ; line <- many $ P.digit
+     ; let l = read line :: Int in
+            return $ S l c  }
   <|>
   do { reserved "recv"
      ; c <- identifier
-     ; return $  R c  }
+     ; symbol "@"
+     ; line <- many $ P.digit
+     ; let l = read line :: Int in
+            return $  R l c  }
   <|>
   do  { reserved "call"
   ; c <- identifier
   ; list <- parens (P.sepBy identifier (P.char ',' <* P.spaces))
-  ;  return $ Call c list }
+  ; symbol "@"
+  ; line <- many $ P.digit
+  ; let l = read line :: Int in
+           return $ Call l c list }
  <|>
   do { return $ Zero }
 
@@ -197,7 +219,7 @@ contzElim (Select l) = Select (L.map contzElim l)
 contzElim p = p
 
 contzElim' (x:y:xs) = case (x,y) of
-                        (Call _ _ , Zero) -> [x] -- No need to keep going
+                        (Call _ _ _ , Zero) -> [x] -- No need to keep going
                         (If p1 p2, Zero) -> [If (contzElim p1) (contzElim p2)]
                         (Select l , Zero) -> [Select (L.map contzElim l)]
                         (_,_) -> (contzElim x):(contzElim' (y:xs))
@@ -228,30 +250,34 @@ throwError current known ty =
 transformSeq :: [String] -> [Interm] -> GT.GoType
 transformSeq vars (x:xs) =
   case x of
-    (Call s l) -> throwError l vars $
-                  GT.Seq [(GT.ChanInst (GT.TVar (s2n s)) (L.map s2n l)), (transformSeq vars xs) ]
+    (Call line s l) -> throwError l vars $
+                  GT.Seq (addLine line "") [(GT.ChanInst (GT.TVar (addLine line "CALL on Line ") (s2n s)) (L.map s2n l)), (transformSeq vars xs) ]
     
-    (Cl s) -> throwError [s] vars $
-              GT.Close (s2n s) (transformSeq vars xs)
+    (Cl line s) -> throwError [s] vars $
+              GT.Close (show line) (s2n s) (transformSeq vars xs)
     
-    (Spawn s l) -> throwError l vars $
-                   GT.Par [(GT.ChanInst (GT.TVar (s2n s)) (L.map s2n l)) , (transformSeq vars xs)]
+    (Spawn line s l) -> throwError l vars $
+                   GT.Par (addLine line "") [(GT.ChanInst (GT.TVar (addLine line "SPAWN on Line ") (s2n s)) (L.map s2n l)) , (transformSeq vars xs)]
 
-    (NewChan s1 s2 n) -> GT.New (fromIntegral n) (bind (s2n s1) (transformSeq (s1:vars) xs))
+    (NewChan line s1 s2 n) -> GT.New (show line) (fromIntegral n) (bind (s2n s1) (transformSeq (s1:vars) xs))
     
-    (If p1 p2) -> GT.IChoice (transform vars p1) (transform vars p2)
+    (If p1 p2) -> GT.IChoice "" (transform vars p1) (transform vars p2)
     
-    (Select l) -> GT.OChoice (L.map (transform vars) l)
+    (Select l) -> GT.OChoice "" (L.map (transform vars) l)
     
-    (T) -> GT.Tau (transformSeq vars xs)
+    (T line) -> GT.Tau (show line) (transformSeq vars xs)
     
-    (S s) -> throwError [s] vars $
-             GT.Send (s2n s) (transformSeq vars xs)
+    (S line s) -> throwError [s] vars $
+             GT.Send (show line) (s2n s) (transformSeq vars xs)
            
-    (R s) -> throwError [s] vars $
-             GT.Recv (s2n s) (transformSeq vars xs)
+    (R line s) -> throwError [s] vars $
+             GT.Recv (show line) (s2n s) (transformSeq vars xs)
     (Zero) -> GT.Null  
 transformSeq vars [] = GT.Null
+
+addLine :: Int -> String -> String
+addLine 0 _ = ""
+addLine i extra = extra ++ show i
 
 transformDef (D s l p) = (s2n s , Embed(GT.ChanAbst (bind (L.map s2n l) (transform l p))))
 transformMain (D _ vars p) = transform vars p
@@ -297,6 +323,8 @@ p1 = "def t0() : tau ; call t0 () ; def t1(a) : send a ; call t1(a) ; def t2(b) 
 p2 = "def t0() : spawn t1(a) ; spawn t2(a) ; def t1(a) : send a ; call t1(a) ; def t2(b) : recv b ; call t2 (b) ;"
 p3 = "def t0() : let a = newchan xpto , 0 ; spawn t1(a) ; spawn t2(a) ; def t1(a) : send a ; call t1(a) ; def t2(b) : recv a ; call t2 (b);"
 p4 = "def main() : let a = newchan xpto, 0 ; spawn r(a) ; call t(a) ; def t(b) : recv b ;"
+p5 = "def t0() : let a = newchan ty, 0 @1; spawn t1(a) @2; send a @3; close a @4; def t1(x) : recv x @6; close x @7;"
+p6 = "def main.main(): let t0 = newchan main.main.t0_0_0, 0 @4; spawn main.recv(t0) @6; call main.main#1(t0) @0; def main.main#1(t0): send t0 @8; call main.main#1(t0, t0) @0; def main.recv(ch): call main.recv#1(ch) @0; def main.recv#1(ch): if recv ch @15; call main.recv#1(ch) @0; else call main.recv#1(ch) @0; endif;"
 
 test :: IO ()
 test = 
