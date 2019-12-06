@@ -6,7 +6,7 @@ def t0() : let a = newchan ty, 0 @1;
 def r(x,y): 
 		--close y @12;
 		let c = newchan ty, 0 @5;
-            recv x @6; 
+         recv x @6; 
 			--close c @11;
 	    call r(x,c) @7;
 

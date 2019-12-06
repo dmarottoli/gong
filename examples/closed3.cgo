@@ -2,11 +2,17 @@
 -- safe because channel 'a' is closed twice
 -- it is however live.
 --
-def t0() : let a = newchan ty, 0 @1; 
-		   let b = newchan ty2, 0 @2;
-		  close a @4;
-		   --close b @5;
-		   recv a @6;
+def main() : 
+	let a = newchan ty, 0 @1; 
+	let b = newchan ty2, 0 @2;
+	spawn aux(b) @3;
+	send b @4;
+	close b @10;
+	close a @5;
+	recv a @6;
+def aux(ch) :
+	recv ch @7;
+
 
 		   
 		   

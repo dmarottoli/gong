@@ -1,0 +1,24 @@
+-- This example illustrates closing of channels this example is *not*
+-- safe because channel 'a' is closed twice
+-- it is however live.
+--
+def main() : 
+	let a = newchan ty, 0 @1; 
+	let b = newchan ty2, 0 @2;
+	spawn s(b) @3;
+	spawn r(b) @4;
+def s(x) :
+	send x @7;
+	call s(x) @8;
+def r(x) :
+	recv x @9;
+	call r(x) @9;
+
+
+		   
+		   
+		   
+		   
+		   
+		   
+

@@ -1,0 +1,10 @@
+def main() : 
+	let a = newchan ty, 0 @1; 
+	let b = newchan ty2, 0 @2;
+	spawn r(a,b) @3;
+
+def r(x,b): 
+	let c = newchan ty, 0 @5;
+	call r(x,c) @7;
+
+	     

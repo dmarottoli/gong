@@ -64,14 +64,14 @@ main = do
                      let bound =  if (kbound pargs) == -1 || (kbound pargs) == 888
                                   then maximum [maxnestednames ty, sizeOfEqs ty]
                                   else kbound pargs
-                     --putStrLn $ "bound: " ++ show bound;
+                     putStrLn $ "bound: " ++ show bound;
                      let listsys = succs bound ty
                      let !tylist = runFreshM listsys
                      --writeFile "prueba2.txt" (show tylist)
                      putStrLn $ "\n TyList Completa: " ++ show tylist
                      --putStrLn $ "Len de la tylist: " ++ show (length tylist)
-                     putStrLn $ "Bound (k): "++(show bound)
-                     putStrLn $ "Number of k-states: "++(show $ length tylist)
+                     --putStrLn $ "Bound (k): "++(show bound)++ "MAXNESTED: " ++ show (sizeOfEqs ty)
+                     --putStrLn $ "Number of k-states: "++(show $ length tylist)
                      when ((check pargs) ==  Debug || (check pargs)==List) $ do
                        let debugty = runFreshM $ getTypes tylist
                        putStrLn $ "\n[Debug]k-reachable states:\n"++(pprintTypeList debugty)
@@ -84,7 +84,7 @@ main = do
                        do let safe = runFreshM $ safety ((check pargs) ==  Debug) bound listsys
                           putStrLn ("Safety: " ++ safe ++ "\n")
                      when ((check pargs) ==  Safety || (proceed pargs)) $
-                       do let oc = runFreshM $ openChannels ((check pargs) ==  Debug) bound listsys
+                       do let oc = runFreshM $ openChannels bound listsys []
                           putStrLn ("Open Channels: " ++ oc ++ "\n")
                      else do selectColor False
                              putStrLn $ (gofile pargs)++" is not fenced"

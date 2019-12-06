@@ -1,8 +1,13 @@
--- This example illustrates closing of channels this example is *not*
--- safe because channel 'a' is closed twice
--- it is however live.
---
-def t0() : let a = newchan ty, 0 @1; 
-    	   close a @2;
-		   recv a @3;
-
+def main():
+    let t0 = newchan main.t0_0_0, 2 @1;
+    send t0 @2;
+    send t0 @3;
+    close t0 @4;
+    let t2 = newchan main.t2_0_0, 2 @5;
+    send t2 @6;
+    call main#1(t0, t2) @0;
+def main#1(t0, t2):
+    recv t0 @7;
+    if call main#1(t0, t2, t0, t2) @0;
+	else recv t2 @8;
+	endif;

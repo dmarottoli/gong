@@ -28,7 +28,12 @@ symCondition m b = S.null $ intersection (fromList m) (fromList b)
 normalise :: Int -> [ChName] -> Environment -> GoType -> GoType
 normalise k names defEnv ty =
   let t1 = nfUnfold k names [] defEnv ty
-  in runFreshM $ nf (gcBuffer . initiate $ t1) --((gcBuffer names) . initiate $ t1)
+  in runFreshM $ nf (gcBuffer . initiate $ t1) 
+
+normalise' :: Int -> [ChName] -> Environment -> GoType -> [ChName]
+normalise' k names defEnv ty =
+  let t1 = nfUnfold k names [] defEnv ty
+  in snd $ runFreshM $ (gcBufferaux (initiate t1))
 
 
 nfUnfold :: Int -> [ChName] -> [EqnName] -> Environment -> GoType -> M GoType
@@ -92,8 +97,6 @@ getGuardsCont (IChoice line t1 t2) = [(Tau line Null, t1), (Tau line Null, t2)]
 getGuardsCont (OChoice line xs) = L.foldr (++) [] $ map getGuardsCont (map (\x -> addToLine x line) xs)
 getGuardsCont (Close l c ty) = [(Close l c Null, ty)]
 getGuardsCont (Buffer c (open,b,k))
-    | not open = [(Send ("BUFFER: {Status: Closed}") c Null, Buffer c (open,b,k))]
-                 --, (ClosedBuffer c, Buffer c (False,b,k))
     | (b==0 && k==0) && open = [(ClosedBuffer c, Buffer c (False,b,k))]
     | (b==0 && k==0) && not open = [ (Send ("BUFFER: {Status: Closed}") c Null, Buffer c (open,b,k))
                                    , (ClosedBuffer c, Buffer c (False,b,k))
@@ -112,8 +115,12 @@ getGuardsCont (Buffer c (open,b,k))
               , (Send ("BUFFER: {Capacity: " ++ show b ++ " - Size: " ++ show k ++ " -> " ++ show (k-1) ++ "}") c Null, Buffer c (open,b,k-1))
               , (ClosedBuffer c, Buffer c (False,b,k))
               ]
+    | not open = [(Send ("BUFFER: {Status: Closed}") c Null, Buffer c (open,b,k))
+                 , (ClosedBuffer c, Buffer c (False,b,k))
+                 ]
     | otherwise = [] 
 getGuardsCont _ = []
+
 
 
 
@@ -200,15 +207,8 @@ succsNode :: Int -> [ChName] -> Eqn -> M [Eqn]
 succsNode bound names (EqnSys bnd) =
   let k = if L.null names then bound else length names
   in do (defs,main) <- unbind bnd
---        traceM ("\n bnd ------------------------------------------------------ " ++ (show bnd))
---        traceM ("\n defs ------------------------------------------------------ " ++ (show defs))
---        traceM ("\n main ------------------------------------------------------ " ++ (show main))
---        traceM ("\n NORMALIZE ------------------------------------------------------" ++ (show (normalise k names (unrec defs) main)))
-        states <- trace ("\n main2 = " ++ show main) $
-                  genStates k names (unrec defs) []
+        states <- genStates k names (unrec defs) []
                   [(normalise k names (unrec defs) main)]
---        traceM ("\n LLEGO ACAAAAAAAA???")
-        traceM ("\n states -----------------------" ++ (show states))
         return $ L.map (\x -> EqnSys $ bind defs x) (states :: [GoType])
 
 

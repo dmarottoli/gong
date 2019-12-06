@@ -1,0 +1,13 @@
+def main.main():
+    let t0 = newchan main.main.t0_0_0, 2 @1;
+    send t0 @2;
+    send t0 @3;
+    close t0 @4;
+    let t2 = newchan main.main.t2_0_0, 1 @5;
+    send t2 @6;
+    call main.main#1(t0, t2) @0;
+def main.main#1(t0, t2):
+    recv t0 @7;
+    if call main.main#1(t0, t2, t0, t2) @0; 
+	else recv t2 @8; 
+	endif;

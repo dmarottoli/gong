@@ -388,73 +388,30 @@ nf t = do t1 <- t
 
 -----------
 
-{--
-gcBufferList :: [ChName] -> [GoType] -> [GoType] -> [GoType]
-gcBufferList names prev [] = prev
-gcBufferList names prev (x:xs) = case x of
-  Null -> gcBufferList names prev xs
-  Buffer c (o,i,j) ->
-    if (j > 0) || o  || (c `L.elem` names)
-    then gcBufferList names (prev++[x]) xs
-    else let fna ys = L.foldr (++) [] $ L.map fv ys
-             left = fna prev
-             right = fna xs
-         in if (c `L.elem` (right++left)) -- || ((L.null prev) && (L.null xs))
-            then gcBufferList names (prev++[x]) xs
-            else gcBufferList names prev xs
-  otherwise -> gcBufferList names (prev++[x]) xs
-                              
-gcBuffer :: [ChName] -> M GoType -> M GoType
-gcBuffer names t = do t' <- t
-                      gcBuffer' names t'
-
-gcBuffer' :: [ChName] -> GoType -> M GoType
-gcBuffer' names (Par line list) = return $ Par line $ gcBufferList names [] list
-gcBuffer' names (New line i bnd) = do
-  (c,t) <- unbind bnd
-  t' <- gcBuffer' names t--(c:names) t
-  return $ New line i (bind c t')
-gcBuffer' names t = return t
 
 
 gcBufferList :: [ChName] -> [GoType] -> [GoType] -> [GoType]
-gcBufferList names prev [] = prev
-gcBufferList names prev (x:xs) = case x of
-  Null -> gcBufferList names prev xs
+gcBufferList names prev xs = fst $ gcBufferListaux names prev xs
+
+gcBufferListaux :: [ChName] -> [GoType] -> [GoType] -> ([GoType],[ChName])
+gcBufferListaux names prev [] = (prev,[])
+gcBufferListaux names prev (x:xs) = case x of
+  Null -> gcBufferListaux names prev xs
   Buffer c (o,i,j) ->
     if (j == 0) || (c `L.elem` names) || (not o)
     then let fna ys = L.foldr (++) [] $ L.map fv ys
              left = fna prev
              right = fna xs
          in if (c `L.elem` (right++left)) || ((L.null prev) && (L.null xs))
-            then gcBufferList names (prev++[x]) xs
-            else trace ("\n no agrego X: " ++ show x) $ gcBufferList names prev xs
-    else gcBufferList names (prev++[x]) xs
-  otherwise -> gcBufferList names (prev++[x]) xs
---}
-
-gcBufferListAux :: [ChName] -> [GoType] -> [GoType] -> [GoType] -> ([GoType],[GoType])
-gcBufferListAux names prev elim [] = (prev,elim)
-gcBufferListAux names prev elim (x:xs) = case x of
-  Null -> gcBufferListAux names prev elim xs
-  Buffer c (o,i,j) ->
-    if (j == 0) || (c `L.elem` names) || (not o)
-    then let fna ys = L.foldr (++) [] $ L.map fv ys
-             left = fna prev
-             right = fna xs
-         in if (c `L.elem` (right++left)) || ((L.null prev) && (L.null xs))
-            then gcBufferListAux names (prev++[x]) elim xs
-            else if o 
-                 then gcBufferListAux names prev (x:elim) xs
-                 else gcBufferListAux names prev elim xs
-    else gcBufferListAux names (prev++[x]) elim xs
-  otherwise -> gcBufferListAux names (prev++[x]) elim xs
+            then gcBufferListaux names (prev++[x]) xs
+            else let rec = gcBufferListaux names prev xs 
+				 in if o 
+					then (fst rec,c:(snd rec))
+					else rec
+    else gcBufferListaux names (prev++[x]) xs
+  otherwise -> gcBufferListaux names (prev++[x]) xs
 
   
-gcBufferList :: [ChName] -> [GoType] -> [GoType] -> [GoType]
-gcBufferList names prev xs = fst $ gcBufferListAux names prev [] xs
-
-                              
 gcBuffer :: M GoType -> M GoType
 gcBuffer t = do t' <- t
                 gcBuffer' [] t'
@@ -466,6 +423,19 @@ gcBuffer' names (New line i bnd) = do
   t' <- gcBuffer' (c:names) t
   return $ New line i (bind c t')
 gcBuffer' names t = return t
+
+
+gcBufferaux :: M GoType -> M (GoType,[ChName])
+gcBufferaux t = do t' <- t
+                   gcBufferaux' [] t'
+
+gcBufferaux' :: [ChName] -> GoType -> M (GoType,[ChName])
+gcBufferaux' names (Par line list) = let rec = gcBufferListaux names [] list in return $ (Par line $ fst rec,snd rec)
+gcBufferaux' names (New line i bnd) = do
+  (c,t) <- unbind bnd
+  (t',l) <- gcBufferaux' (c:names) t
+  return $ (New line i (bind c t'),l)
+gcBufferaux' names t = return (t,[])
 
 
 -- Once unfoldings of GoTypes and EquationSys --
